@@ -1,0 +1,13 @@
+{
+  "name": "echo-api-specs",
+  "version": "1.0.0",
+  "private": true,
+  "description": "API specifications for the Echo App",
+  "dependencies": {
+    "@typespec/compiler": "latest",
+    "@typespec/http": "latest",
+    "@typespec/openapi": "latest",
+    "@typespec/openapi3": "latest",
+    "@typespec/rest": "latest"
+  }
+}

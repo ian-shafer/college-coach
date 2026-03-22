@@ -1,0 +1,11 @@
+# Build and generated output
+build/
+.gradle/
+
+# Node / TypeSpec dependencies
+node_modules/
+
+# OS and IDE files
+.DS_Store
+.idea/
+*.iml

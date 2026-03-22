@@ -1,0 +1,10 @@
+#!/bin/bash
+source "$(dirname "$0")/common"
+
+echo "Compiling TypeSpec to OpenAPI..."
+docker compose up typespec-compiler || { echo "Error: Failed to compile TypeSpec to OpenAPI."; exit 1; }
+
+echo "Generating Ktor Server models from OpenAPI..."
+docker compose up openapi-generator || { echo "Error: Failed to generate Ktor models."; exit 1; }
+
+echo "Successfully built all specified artifacts into [/build]."

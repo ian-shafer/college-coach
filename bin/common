@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# Save the original directory and use a trap to guarantee return on exit
+START_DIR="$PWD"
+trap 'cd "$START_DIR" > /dev/null 2>&1' EXIT
+
+# Navigate to the project root universally
+TARGET_DIR="$(dirname "${BASH_SOURCE[0]}")/.."
+cd "$TARGET_DIR" || { echo "Error: Could not cd to [$TARGET_DIR]"; exit 1; }

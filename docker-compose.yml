@@ -1,0 +1,29 @@
+services:
+  typespec-compiler:
+    image: node:20-alpine
+    volumes:
+      - .:/workspace
+    working_dir: /workspace/specs/api
+    command: /bin/sh -c "npm install && npx tsp compile ."
+
+  openapi-generator:
+    image: openapitools/openapi-generator-cli:latest
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+    command: >-
+      generate
+      -i /workspace/build/api/openapi3/openapi.yaml
+      -g kotlin-server
+      --additional-properties=library=ktor,packageName=com.echoapp
+      --global-property models
+      -o /workspace/build/rest-server-stubs
+
+  rest-server:
+    image: gradle:8.5-jdk21
+    volumes:
+      - .:/workspace
+    working_dir: /workspace/rest-server
+    ports:
+      - "8080:8080"
+    command: gradle run
