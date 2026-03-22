@@ -27,3 +27,13 @@ services:
     ports:
       - "8080:8080"
     command: gradle run
+
+  api-test:
+    image: schemathesis/schemathesis:stable
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+    command: >-
+      run /workspace/build/api/openapi3/openapi.yaml
+      --url http://rest-server:8080
+      --checks not_a_server_error,status_code_conformance,content_type_conformance,response_schema_conformance

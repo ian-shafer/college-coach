@@ -29,3 +29,6 @@ The LLM / Agent must always adhere to the following rules when designing or impl
 # Error handling
 1. Errors must always be logged in a manner visible to the user.
 1. **Explicit Errors:** When generating error, warning, info, or debug messages, message must be as concise as possible, and any dynamic variables must always be bracketed with `[` and `]` (e.g., `Could not cd to [/a/directory]`).
+
+# Version control
+1. **User Review Required:** Never auto-run `git commit` without explicitly allowing the user to view the full `git diff`. The user must manually approve the code changes before they are permanently committed into the repository history.

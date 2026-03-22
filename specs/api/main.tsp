@@ -16,4 +16,4 @@ model EchoMessage {
 
 @route("/echo")
 @post
-op echo(@body body: EchoMessage): EchoMessage;
+op echo(@body body: EchoMessage): EchoMessage | BadRequestResponse;
