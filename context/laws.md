@@ -15,6 +15,9 @@ The LLM / Agent must always adhere to the following rules when designing or impl
 # Programming paradigms
 1. **Functional Programming:** Always prefer functional programming ideas. Specifically, emphasize immutability and pure functions throughout the codebase.
 
+# Architecture & robustness
+1. **Robust Encapsulation:** Make code as robust as possible. A change in one part of the codebase should not break another part of the codebase. Strictly enforce separation of concerns, modular interfaces, and strict boundary limits.
+
 # Language preferences
 1. **Language Preference:** Always prefer statically compiled languages over interpreted languages.
 2. **Platform Preference:** Prefer the JVM as a deployment platform.
