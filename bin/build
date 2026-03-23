@@ -7,4 +7,7 @@ docker compose up typespec-compiler || { echo "Error: Failed to compile TypeSpec
 echo "Generating Ktor Server models from OpenAPI..."
 docker compose up openapi-generator || { echo "Error: Failed to generate Ktor models."; exit 1; }
 
+echo "Generating Swift 5 iOS SDK from OpenAPI..."
+docker compose up openapi-generator-swift || { echo "Error: Failed to generate Swift client."; exit 1; }
+
 echo "Successfully built all specified artifacts into [/build]."

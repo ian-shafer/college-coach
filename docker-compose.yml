@@ -19,6 +19,18 @@ services:
       --global-property models
       -o /workspace/build/rest-server-stubs
 
+  openapi-generator-swift:
+    image: openapitools/openapi-generator-cli:latest
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+    command: >-
+      generate
+      -i /workspace/build/api/openapi3/openapi.yaml
+      -g swift5
+      --additional-properties=projectName=EchoAPI
+      -o /workspace/build/ios-client-stubs
+
   rest-server:
     image: gradle:8.5-jdk21
     volumes:

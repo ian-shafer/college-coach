@@ -13,3 +13,8 @@ node_modules/
 
 # Testing Cache
 .hypothesis/
+
+# Xcode
+xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
