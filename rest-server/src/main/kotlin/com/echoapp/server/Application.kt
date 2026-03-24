@@ -12,6 +12,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.Json
+import com.echoapp.server.routes.authRoutes
 
 fun main() {
     embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
@@ -34,6 +35,8 @@ fun Application.module() {
     }
 
     routing {
+        authRoutes()
+
         post("/echo") {
             val requestMessage = call.receive<EchoMessage>()
             call.respond(requestMessage)
