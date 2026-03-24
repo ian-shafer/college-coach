@@ -12,6 +12,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 
 fun AuthRequest.validate(): String? {
@@ -52,5 +53,34 @@ fun Route.authRoutes(jwtService: JwtService) {
         } catch (e: Exception) {
             call.respond(HttpStatusCode.InternalServerError, "[Registration failed]")
         }
+    }
+
+    post("/auth/login") {
+        val request = call.receive<AuthRequest>()
+
+        val validationError = request.validate()
+        if (validationError != null) {
+            call.respond(HttpStatusCode.BadRequest, validationError)
+            return@post
+        }
+
+        var userId: String? = null
+        var storedHash: String? = null
+
+        transaction {
+            val userRow = Users.select { Users.email eq request.email.lowercase() }.singleOrNull()
+            if (userRow != null) {
+                userId = userRow[Users.id]
+                storedHash = userRow[Users.passwordHash]
+            }
+        }
+
+        if (userId == null || storedHash == null || !PasswordHasher.verifyPassword(request.password, storedHash!!)) {
+            call.respond(HttpStatusCode.Unauthorized, "[Invalid credentials]")
+            return@post
+        }
+
+        val token = jwtService.generateToken(userId!!, request.email.lowercase())
+        call.respond(HttpStatusCode.OK, AuthResponse(token = token))
     }
 }
