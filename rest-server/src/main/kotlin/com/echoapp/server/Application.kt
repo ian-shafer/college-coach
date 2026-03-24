@@ -31,6 +31,16 @@ fun Application.module() {
             call.response.header("Allow", "POST")
             call.respondText("Method Not Allowed", status = status)
         }
+        exception<Throwable> { call, cause ->
+            when (cause) {
+                is io.ktor.server.plugins.BadRequestException, is kotlinx.serialization.SerializationException -> {
+                    call.respond(HttpStatusCode.BadRequest, com.echoapp.models.ErrorResponse("Invalid JSON payload"))
+                }
+                else -> {
+                    call.respond(HttpStatusCode.InternalServerError, com.echoapp.models.ErrorResponse("Internal Server Error"))
+                }
+            }
+        }
     }
 
     val jwtService = com.echoapp.server.auth.JwtService(environment.config)

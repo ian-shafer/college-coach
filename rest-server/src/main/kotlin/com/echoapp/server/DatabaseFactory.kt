@@ -12,8 +12,8 @@ object Users : Table() {
     val id = varchar("id", 8)
     val email = varchar("email", 255).uniqueIndex()
     val passwordHash = varchar("password_hash", 255)
-    val createdAt = timestamp("created_at").defaultExpression(CurrentTimestamp)
-    val updatedAt = timestamp("updated_at").defaultExpression(CurrentTimestamp)
+    val createdAt = timestamp("created_at").defaultExpression(CurrentTimestamp())
+    val updatedAt = timestamp("updated_at").defaultExpression(CurrentTimestamp())
     val fullName = varchar("full_name", 255).nullable()
     val displayName = varchar("display_name", 255).nullable()
 

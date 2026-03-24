@@ -38,10 +38,34 @@ model AuthResponse {
   token: string;
 }
 
+@error
+model BadRequestResponse {
+  @statusCode statusCode: 400;
+  message: string;
+}
+
+@error
+model InternalServerErrorResponse {
+  @statusCode statusCode: 500;
+  message: string;
+}
+
+@error
+model UnauthorizedResponse {
+  @statusCode statusCode: 401;
+  message: string;
+}
+
+@error
+model ConflictResponse {
+  @statusCode statusCode: 409;
+  message: string;
+}
+
 @route("/auth/register")
 @post
-op register(@body body: AuthRequest): AuthResponse | BadRequestResponse;
+op register(@body body: AuthRequest): AuthResponse | BadRequestResponse | ConflictResponse | InternalServerErrorResponse;
 
 @route("/auth/login")
 @post
-op login(@body body: AuthRequest): AuthResponse | BadRequestResponse;
+op login(@body body: AuthRequest): AuthResponse | BadRequestResponse | UnauthorizedResponse;

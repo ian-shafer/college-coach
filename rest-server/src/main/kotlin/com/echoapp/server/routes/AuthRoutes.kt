@@ -2,6 +2,7 @@ package com.echoapp.server.routes
 
 import com.echoapp.models.AuthRequest
 import com.echoapp.models.AuthResponse
+import com.echoapp.models.ErrorResponse
 import com.echoapp.server.Users
 import com.echoapp.server.auth.IdGenerator
 import com.echoapp.server.auth.PasswordHasher
@@ -14,6 +15,7 @@ import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
+import com.echoapp.server.auth.JwtService
 
 fun AuthRequest.validate(): String? {
     val missing = mutableListOf<String>()
@@ -30,7 +32,7 @@ fun Route.authRoutes(jwtService: JwtService) {
 
         val validationError = request.validate()
         if (validationError != null) {
-            call.respond(HttpStatusCode.BadRequest, validationError)
+            call.respond(HttpStatusCode.BadRequest, ErrorResponse(validationError))
             return@post
         }
 
@@ -49,9 +51,9 @@ fun Route.authRoutes(jwtService: JwtService) {
             val token = jwtService.generateToken(newId, request.email.lowercase())
             call.respond(HttpStatusCode.OK, AuthResponse(token = token))
         } catch (e: ExposedSQLException) {
-            call.respond(HttpStatusCode.Conflict, "[Email already exists]")
+            call.respond(HttpStatusCode.Conflict, ErrorResponse("[Email already exists]"))
         } catch (e: Exception) {
-            call.respond(HttpStatusCode.InternalServerError, "[Registration failed]")
+            call.respond(HttpStatusCode.InternalServerError, ErrorResponse("[Registration failed]"))
         }
     }
 
@@ -60,7 +62,7 @@ fun Route.authRoutes(jwtService: JwtService) {
 
         val validationError = request.validate()
         if (validationError != null) {
-            call.respond(HttpStatusCode.BadRequest, validationError)
+            call.respond(HttpStatusCode.BadRequest, ErrorResponse(validationError))
             return@post
         }
 
@@ -76,7 +78,7 @@ fun Route.authRoutes(jwtService: JwtService) {
         }
 
         if (userId == null || storedHash == null || !PasswordHasher.verifyPassword(request.password, storedHash!!)) {
-            call.respond(HttpStatusCode.Unauthorized, "[Invalid credentials]")
+            call.respond(HttpStatusCode.Unauthorized, ErrorResponse("[Invalid credentials]"))
             return@post
         }
 
