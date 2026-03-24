@@ -30,6 +30,7 @@ The LLM / Agent must always adhere to the following rules when designing or impl
 # Programming paradigms
 1. **Functional Programming:** Always prefer functional programming ideas. Emphasize immutability and pure functions throughout the codebase.
 2. **Robust Encapsulation:** Make code as robust as possible. A change in one part of the codebase should not break another. Enforce separation of concerns and strict boundary limits.
+3. **No Magic Values:** Never use hard-coded "magic" numbers or strings directly inline. Always extract them strictly into named arguments, functional parameters, or explicit structural constants.
 
 # Language preferences
 1. **Language Preference:** Prefer statically compiled languages over interpreted languages.
@@ -41,3 +42,6 @@ The LLM / Agent must always adhere to the following rules when designing or impl
 1. Errors must always be logged in a manner visible to the user.
 2. **Explicit Errors:** When generating error messages, formatting must be concise, and dynamic variables must be bracketed with `[` and `]` (e.g., `Could not cd to [/a/directory]`).
 3. **User Review Required:** Never run `git commit` without allowing the user to view the full `git diff`. The user must manually approve code changes before they are committed.
+
+# Code Formatting
+1. **Trailing Whitespace (Temporary):** Before adding files to git staging, ensure all trailing whitespaces are stripped (e.g. matching `s/\s+$//`).
