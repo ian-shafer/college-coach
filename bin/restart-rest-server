@@ -1,0 +1,5 @@
+#!/bin/bash
+source "$(dirname "$0")/common"
+
+echo "Restarting the Ktor REST server via Docker Compose..."
+docker compose restart rest-server
