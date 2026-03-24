@@ -23,7 +23,7 @@ fun AuthRequest.validate(): String? {
     return "[${missing.joinToString(" and ")}] cannot be empty"
 }
 
-fun Route.authRoutes() {
+fun Route.authRoutes(jwtService: JwtService) {
     post("/auth/register") {
         val request = call.receive<AuthRequest>()
 
@@ -42,12 +42,11 @@ fun Route.authRoutes() {
                     it[id] = newId
                     it[email] = request.email.lowercase()
                     it[passwordHash] = hashedPw
-                    it[fullName] = ""
-                    it[displayName] = ""
                 }
             }
-            
-            call.respond(HttpStatusCode.OK, AuthResponse(token = "jwt_pending_step_7"))
+
+            val token = jwtService.generateToken(newId, request.email.lowercase())
+            call.respond(HttpStatusCode.OK, AuthResponse(token = token))
         } catch (e: ExposedSQLException) {
             call.respond(HttpStatusCode.Conflict, "[Email already exists]")
         } catch (e: Exception) {
