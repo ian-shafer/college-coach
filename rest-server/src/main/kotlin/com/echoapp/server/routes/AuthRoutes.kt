@@ -12,7 +12,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.jetbrains.exposed.exceptions.ExposedSQLException
-import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.insertIgnore
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import com.echoapp.server.auth.JwtService
@@ -38,8 +38,8 @@ fun Route.authRoutes(jwtService: JwtService) {
         val hashedPw = PasswordHasher.hashPassword(request.password)
 
         try {
-            transaction {
-                Users.insert {
+            val wasInserted = transaction {
+                val stmt = Users.insertIgnore {
                     it[id] = newId
                     it[email] = request.email.lowercase()
                     it[passwordHash] = hashedPw
@@ -47,13 +47,19 @@ fun Route.authRoutes(jwtService: JwtService) {
                     it[lastName] = request.lastName?.takeIf { s -> s.isNotBlank() }
                     it[displayName] = request.displayName?.takeIf { s -> s.isNotBlank() }
                 }
+                stmt.insertedCount > 0
+            }
+            
+            if (!wasInserted) {
+                call.application.environment.log.warn("Registration attempt failed: Duplicate email [${request.email}]")
+                call.respond(HttpStatusCode.Conflict, ErrorResponse(errors = mapOf("email" to "[Email already exists]")))
+                return@post
             }
 
             val token = jwtService.generateToken(newId, request.email.lowercase())
             call.respond(HttpStatusCode.OK, AuthResponse(token = token))
-        } catch (e: ExposedSQLException) {
-            call.respond(HttpStatusCode.Conflict, ErrorResponse(errors = mapOf("email" to "[Email already exists]")))
         } catch (e: Exception) {
+            call.application.environment.log.error("Registration failed [${e.message}]")
             call.respond(HttpStatusCode.InternalServerError, ErrorResponse(messages = listOf("[Registration failed]")))
         }
     }

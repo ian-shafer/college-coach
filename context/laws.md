@@ -50,6 +50,7 @@ The LLM / Agent must always adhere to the following rules when designing or impl
 1. Errors must always be logged in a manner visible to the user.
 2. **Explicit Errors:** When generating error messages, formatting must be concise, and dynamic variables must be bracketed with `[` and `]` (e.g., `Could not cd to [/a/directory]`).
 3. **User Review Required:** Never run `git commit` without allowing the user to view the full `git diff`. The user must manually approve code changes before they are committed.
+4. **Expected Exceptions:** Expected use cases (e.g., duplicate emails or invalid credentials) must not clutter the console with full system stack traces. Intercept these events cleanly and emit a simple, single-line WARN log.
 
 # Code Formatting
 1. **Trailing Whitespace (Temporary):** Before adding files to git staging, ensure all trailing whitespaces are stripped (e.g. matching `s/\s+$//`).
