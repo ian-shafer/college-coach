@@ -39,28 +39,33 @@ model AuthResponse {
   token: string;
 }
 
+model ErrorResponseBody {
+  messages?: string[];
+  errors?: Record<string>;
+}
+
 @error
 model BadRequestResponse {
   @statusCode statusCode: 400;
-  message: string;
+  ...ErrorResponseBody;
 }
 
 @error
 model InternalServerErrorResponse {
   @statusCode statusCode: 500;
-  message: string;
+  ...ErrorResponseBody;
 }
 
 @error
 model UnauthorizedResponse {
   @statusCode statusCode: 401;
-  message: string;
+  ...ErrorResponseBody;
 }
 
 @error
 model ConflictResponse {
   @statusCode statusCode: 409;
-  message: string;
+  ...ErrorResponseBody;
 }
 
 @route("/auth/register")

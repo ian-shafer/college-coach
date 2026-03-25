@@ -17,22 +17,20 @@ import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import com.echoapp.server.auth.JwtService
 
-fun AuthRequest.validate(): String? {
-    val missing = mutableListOf<String>()
-    if (email.isBlank()) missing.add("Email")
-    if (password.isBlank()) missing.add("Password")
-    
-    if (missing.isEmpty()) return null
-    return "[${missing.joinToString(" and ")}] cannot be empty"
+fun AuthRequest.validate(): Map<String, String> {
+    val errors = mutableMapOf<String, String>()
+    if (email.isBlank()) errors["email"] = "[Email] cannot be empty"
+    if (password.isBlank()) errors["password"] = "[Password] cannot be empty"
+    return errors
 }
 
 fun Route.authRoutes(jwtService: JwtService) {
     post("/auth/register") {
         val request = call.receive<AuthRequest>()
 
-        val validationError = request.validate()
-        if (validationError != null) {
-            call.respond(HttpStatusCode.BadRequest, ErrorResponse(validationError))
+        val validationErrors = request.validate()
+        if (validationErrors.isNotEmpty()) {
+            call.respond(HttpStatusCode.BadRequest, ErrorResponse(errors = validationErrors))
             return@post
         }
 
@@ -51,18 +49,18 @@ fun Route.authRoutes(jwtService: JwtService) {
             val token = jwtService.generateToken(newId, request.email.lowercase())
             call.respond(HttpStatusCode.OK, AuthResponse(token = token))
         } catch (e: ExposedSQLException) {
-            call.respond(HttpStatusCode.Conflict, ErrorResponse("[Email already exists]"))
+            call.respond(HttpStatusCode.Conflict, ErrorResponse(errors = mapOf("email" to "[Email already exists]")))
         } catch (e: Exception) {
-            call.respond(HttpStatusCode.InternalServerError, ErrorResponse("[Registration failed]"))
+            call.respond(HttpStatusCode.InternalServerError, ErrorResponse(messages = listOf("[Registration failed]")))
         }
     }
 
     post("/auth/login") {
         val request = call.receive<AuthRequest>()
 
-        val validationError = request.validate()
-        if (validationError != null) {
-            call.respond(HttpStatusCode.BadRequest, ErrorResponse(validationError))
+        val validationErrors = request.validate()
+        if (validationErrors.isNotEmpty()) {
+            call.respond(HttpStatusCode.BadRequest, ErrorResponse(errors = validationErrors))
             return@post
         }
 
@@ -78,7 +76,7 @@ fun Route.authRoutes(jwtService: JwtService) {
         }
 
         if (userId == null || storedHash == null || !PasswordHasher.verifyPassword(request.password, storedHash!!)) {
-            call.respond(HttpStatusCode.Unauthorized, ErrorResponse("[Invalid credentials]"))
+            call.respond(HttpStatusCode.Unauthorized, ErrorResponse(messages = listOf("[Invalid credentials]")))
             return@post
         }
 

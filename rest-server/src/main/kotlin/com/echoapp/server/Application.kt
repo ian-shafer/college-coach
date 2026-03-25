@@ -34,10 +34,10 @@ fun Application.module() {
         exception<Throwable> { call, cause ->
             when (cause) {
                 is io.ktor.server.plugins.BadRequestException, is kotlinx.serialization.SerializationException -> {
-                    call.respond(HttpStatusCode.BadRequest, com.echoapp.models.ErrorResponse("Invalid JSON payload"))
+                    call.respond(HttpStatusCode.BadRequest, com.echoapp.models.ErrorResponse(messages = listOf("Invalid JSON payload")))
                 }
                 else -> {
-                    call.respond(HttpStatusCode.InternalServerError, com.echoapp.models.ErrorResponse("Internal Server Error"))
+                    call.respond(HttpStatusCode.InternalServerError, com.echoapp.models.ErrorResponse(messages = listOf("Internal Server Error")))
                 }
             }
         }
