@@ -7,6 +7,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.javatime.timestamp
 import org.jetbrains.exposed.sql.javatime.CurrentTimestamp
 import java.io.File
+import io.ktor.server.config.ApplicationConfig
 
 object Users : Table() {
     val id = varchar("id", 8)
@@ -22,11 +23,13 @@ object Users : Table() {
 }
 
 object DatabaseFactory {
-    fun init() {
-        val dir = File("data")
-        if (!dir.exists()) dir.mkdirs()
+    fun init(config: ApplicationConfig) {
+        val dbFile = config.propertyOrNull("database.file")?.getString() ?: "var/echo.db"
+        val file = File(dbFile)
+        val dir = file.parentFile
+        if (dir != null && !dir.exists()) dir.mkdirs()
 
-        Database.connect("jdbc:sqlite:data/echo.db", "org.sqlite.JDBC")
+        Database.connect("jdbc:sqlite:$dbFile", "org.sqlite.JDBC")
 
         transaction {
             SchemaUtils.create(Users)

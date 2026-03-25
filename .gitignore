@@ -2,6 +2,7 @@
 build/
 .gradle/
 schema-coverage.html
+var/
 
 # Node / TypeSpec dependencies
 node_modules/
