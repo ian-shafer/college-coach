@@ -80,7 +80,7 @@ class RegistrationViewModel: ObservableObject {
     }
     
     private func handleError(_ error: Error) {
-        if case let ErrorResponse.error(_, data, _, _) = error as? ErrorResponse, let errorData = data {
+        if let errorResponse = error as? ErrorResponse, case let .error(_, data, _, _) = errorResponse, let errorData = data {
             do {
                 let errorBody = try JSONDecoder().decode(ErrorResponseBody.self, from: errorData)
                 if let apiErrors = errorBody.errors {

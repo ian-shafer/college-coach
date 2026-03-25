@@ -8,7 +8,7 @@ struct EchoAppApp: App {
     }
     var body: some Scene {
         WindowGroup {
-            RegistrationView()
+            ContentView()
         }
     }
 }

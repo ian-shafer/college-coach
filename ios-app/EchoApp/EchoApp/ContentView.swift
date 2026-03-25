@@ -7,44 +7,58 @@ struct ContentView: View {
     @State private var isLoading: Bool = false
 
     var body: some View {
-        VStack(spacing: 24) {
-            Image(systemName: "waveform.circle.fill")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 80, height: 80)
-                .foregroundColor(.blue)
-            
-            Text("Server Echo")
-                .font(.largeTitle)
-                .bold()
-            
-            TextField("Enter a message...", text: $inputText)
-                .textFieldStyle(.roundedBorder)
-                .padding(.horizontal)
-            
-            Button(action: {
-                sendEcho()
-            }) {
-                Text(isLoading ? "Sending..." : "Send Payload")
+        NavigationView {
+            VStack(spacing: 24) {
+                Image(systemName: "waveform.circle.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 80, height: 80)
+                    .foregroundColor(.blue)
+                
+                Text("Server Echo")
+                    .font(.largeTitle)
                     .bold()
-                    .frame(maxWidth: .infinity)
+                
+                TextField("Enter a message...", text: $inputText)
+                    .textFieldStyle(.roundedBorder)
+                    .padding(.horizontal)
+                
+                Button(action: {
+                    sendEcho()
+                }) {
+                    Text(isLoading ? "Sending..." : "Send Payload")
+                        .bold()
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                }
+                .padding(.horizontal)
+                .disabled(inputText.isEmpty || isLoading)
+                
+                Text(responseText)
+                    .font(.body)
+                    .foregroundColor(.secondary)
                     .padding()
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(12)
+                    .multilineTextAlignment(.center)
+                
+                Spacer()
+                
+                NavigationLink(destination: RegistrationView()) {
+                    Text("Create an Account")
+                        .bold()
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.secondary.opacity(0.15))
+                        .cornerRadius(12)
+                        .foregroundColor(.primary)
+                }
+                .padding(.horizontal)
             }
-            .padding(.horizontal)
-            .disabled(inputText.isEmpty || isLoading)
-            
-            Text(responseText)
-                .font(.body)
-                .foregroundColor(.secondary)
-                .padding()
-                .multilineTextAlignment(.center)
-            
-            Spacer()
+            .padding()
+            .navigationBarHidden(true)
         }
-        .padding()
     }
     
     private func sendEcho() {
@@ -52,9 +66,8 @@ struct ContentView: View {
         isLoading = true
         responseText = "Connecting..."
         
-        // Explicitly set the base path to point to Ktor
+        // The base path is securely mounted statically via AppConfig
         EchoAPIAPI.customHeaders = [:] // Reset if needed
-        EchoAPIAPI.basePath = "http://localhost:8080"
         
         let message = EchoMessage(message: inputText)
         
