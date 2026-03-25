@@ -10,10 +10,11 @@ The LLM / Agent must always adhere to the following rules when designing or impl
 # Planning & Architecture
 1. **Active Task Lifecycle:** The current task is always specified in the `/active-task` directory and follows a strict 3-Phase lifecycle:
    * **Phase 1: Author the Milestone Definition (`active-task/milestone.md`)**:
-     1. Define the high-level milestone. What will be different after this milestone is complete? What new features will be available to the user?
-     2. Identify the parts of the milestone (e.g., database, schema).
-     3. Go through each part identified and discuss/document the design.
-     4. Review the milestone definition with fresh eyes to determine readiness. If the milestone definition is not clear, concise, and well-structured, edit it until it is.
+     1. Check out a new `git branch` specifically named for the upcoming milestone.
+     2. Define the high-level milestone. What will be different after this milestone is complete? What new features will be available to the user?
+     3. Identify the parts of the milestone (e.g., database, schema).
+     4. Go through each part identified and discuss/document the design.
+     5. Review the milestone definition with fresh eyes to determine readiness. If the milestone definition is not clear, concise, and well-structured, edit it until it is.
      
      **Milestone Template:**
      # Milestone: {milestone_name}
@@ -24,8 +25,15 @@ The LLM / Agent must always adhere to the following rules when designing or impl
      
    * **Phase 2: Implementation Plan (`active-task/implementation-plan.md`)**: Discuss the steps for implementation. Always prefer smaller steps (e.g., Step 1: write a utility method. Step 2: use the method). Each step represents a single code submission. Steps must be ordered sequentially. Adding dependencies (e.g., modifying `build.gradle.kts`) should never be its own standalone step, but rather considered a side-effect of the code requiring those libraries.
    * **Phase 3: Implementation**: Implement, review, and submit each step sequentially as defined in the plan.
-2. **Unspecified Choices:** When encountering an implementation detail or library choice not explicitly specified by the user (e.g., a hashing algorithm or database driver), ALWAYS ask the user before adding it to the implementation plan. Never make unprompted architectural assumptions.
-3. **Presenting Options:** When presenting architectural or library options to the user, provide a short description for each option and include a clear recommendation.
+2. **Milestone Interruptions (Sub-Milestones):** If the current active milestone requires completing a new sub-milestone, execute the following steps:
+   1. `git stash` the current changes.
+   2. Check out a fresh `git branch` for the new milestone.
+   3. Execute the standard milestone process on the new branch (Plan -> Implement -> Test -> Commit).
+   4. Once the sub-milestone is complete, `git rebase` its branch onto the initial milestone branch.
+   5. `git stash pop` the stashed changes.
+   6. Resume execution on the initial milestone.
+3. **Unspecified Choices:** When encountering an implementation detail or library choice not explicitly specified by the user (e.g., a hashing algorithm or database driver), ALWAYS ask the user before adding it to the implementation plan. Never make unprompted architectural assumptions.
+4. **Presenting Options:** When presenting architectural or library options to the user, provide a short description for each option and include a clear recommendation.
 
 # Programming paradigms
 1. **Functional Programming:** Always prefer functional programming ideas. Emphasize immutability and pure functions throughout the codebase.
