@@ -43,6 +43,9 @@ fun Route.authRoutes(jwtService: JwtService) {
                     it[id] = newId
                     it[email] = request.email.lowercase()
                     it[passwordHash] = hashedPw
+                    it[firstName] = request.firstName?.takeIf { s -> s.isNotBlank() }
+                    it[lastName] = request.lastName?.takeIf { s -> s.isNotBlank() }
+                    it[displayName] = request.displayName?.takeIf { s -> s.isNotBlank() }
                 }
             }
 

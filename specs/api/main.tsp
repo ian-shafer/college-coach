@@ -33,6 +33,9 @@ model User {
 model AuthRequest {
   email: string;
   password: string;
+  firstName?: string;
+  lastName?: string;
+  displayName?: string;
 }
 
 model AuthResponse {
