@@ -14,7 +14,8 @@ object Users : Table() {
     val passwordHash = varchar("password_hash", 255)
     val createdAt = timestamp("created_at").defaultExpression(CurrentTimestamp())
     val updatedAt = timestamp("updated_at").defaultExpression(CurrentTimestamp())
-    val fullName = varchar("full_name", 255).nullable()
+    val firstName = varchar("first_name", 255).nullable()
+    val lastName = varchar("last_name", 255).nullable()
     val displayName = varchar("display_name", 255).nullable()
 
     override val primaryKey = PrimaryKey(id)

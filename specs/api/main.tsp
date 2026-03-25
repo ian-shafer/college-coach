@@ -21,7 +21,8 @@ op echo(@body body: EchoMessage): EchoMessage | BadRequestResponse;
 model User {
   id: string;
   email: string;
-  fullName?: string;
+  firstName?: string;
+  lastName?: string;
   displayName?: string;
   @doc("ISO-8601 formatted UTC datetime")
   createdAt: utcDateTime;
