@@ -1,17 +1,11 @@
-# Milestone: iOS Registration Flow
+# Milestone: Logout Endpoint
 
-Implement a user registration screen within the Echo iOS application. This interface allows new users to create an account by submitting their details to the REST API.
+We will expose an official `/auth/logout` endpoint in the REST API. This will verify the user's active session before resolving successfully. 
 
-# Part 1: User Interface
-Build a SwiftUI view containing form fields for:
-- Email
-- Password
-- First Name (Optional)
-- Last Name (Optional)
-- Display Name (Optional, UI defaults to First Name if empty)
+Since we are using stateless JWTs for authentication and adhering to the "Statelessness" Architecture Rule, "logging out" on the backend primarily serves as a verifiable handshake for client applications to clear their local credentials. We will avoid implementing a stateful database blacklist unless explicitly required.
 
-# Part 2: State Management & Form Handling
-Create an observable ViewModel pointing to the View. The ViewModel tracks the user's keystrokes and runs client-side validation to enforce basic formatting before network calls are made.
+# Part 1: API Contract (TypeSpec)
+Update `main.tsp` to feature an `@post /logout` path under the core Auth namespace. It should require an active `Authorization` header and securely return a `200 OK` on success.
 
-# Part 3: Networking Data Layer
-Integrate the generated OpenAPI SDK to map the form data into an `AuthRequest` and transmit it over HTTP to the `/auth/register` endpoint. If the user successfully registers, store the resulting JWT in the iOS Keychain. Any API errors should return as visible UI alerts.
+# Part 2: Ktor Endpoint
+Define a `post("/logout")` block inside the explicit `authenticate("auth-jwt") { }` router inside `AuthRoutes.kt`. The endpoint will confirm the JWT is structurally valid and immediately return `200 OK`, officially signaling the client application to destroy the token natively from local device storage.

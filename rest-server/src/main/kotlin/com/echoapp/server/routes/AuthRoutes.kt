@@ -92,4 +92,8 @@ fun Route.authRoutes(jwtService: JwtService) {
         val token = jwtService.generateToken(userId!!, request.email.lowercase())
         call.respond(HttpStatusCode.OK, AuthResponse(token = token))
     }
+
+    post("/auth/logout") {
+        call.respond(HttpStatusCode.NoContent)
+    }
 }

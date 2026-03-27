@@ -78,3 +78,7 @@ op register(@body body: AuthRequest): AuthResponse | BadRequestResponse | Confli
 @route("/auth/login")
 @post
 op login(@body body: AuthRequest): AuthResponse | BadRequestResponse | UnauthorizedResponse;
+
+@route("/auth/logout")
+@post
+op logout(): void;
