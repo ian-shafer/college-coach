@@ -4,7 +4,7 @@ import EchoAPI
 public class EchoApiUserAdapter: UserRepository {
     public init() {}
     
-    public func updateProfile(payload: ProfileUpdatePayload) async throws -> DomainUser {
+    public func updateProfile(payload: ProfileUpdate) async throws -> DomainUser {
         let request = UpdateProfileRequest(
             email: payload.email,
             password: payload.password,

@@ -25,7 +25,7 @@ public class ProfileViewModel: ObservableObject {
         isLoading = true
         globalMessages.removeAll()
         
-        let payload = ProfileUpdatePayload(
+        let payload = ProfileUpdate(
             email: email.isEmpty ? nil : email,
             password: password.isEmpty ? nil : password,
             firstName: firstName.isEmpty ? nil : firstName,

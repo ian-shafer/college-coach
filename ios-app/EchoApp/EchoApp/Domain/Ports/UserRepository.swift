@@ -1,6 +1,6 @@
 import Foundation
 
-public struct ProfileUpdatePayload {
+public struct ProfileUpdate {
     public let email: String?
     public let password: String?
     public let firstName: String?
@@ -25,5 +25,5 @@ public struct DomainUser {
 }
 
 public protocol UserRepository {
-    func updateProfile(payload: ProfileUpdatePayload) async throws -> DomainUser
+    func updateProfile(payload: ProfileUpdate) async throws -> DomainUser
 }
