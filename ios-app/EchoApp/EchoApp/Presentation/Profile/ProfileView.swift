@@ -41,13 +41,12 @@ struct ProfileView: View {
                     .disabled(viewModel.isLoading)
                 }
                 
-                    Button(action: {
-                        viewModel.logout(store: store)
-                    }) {
-                        Text("Logout")
-                            .foregroundColor(.red)
-                            .frame(maxWidth: .infinity)
-                    }
+                Button(action: {
+                    viewModel.logout(store: store)
+                }) {
+                    Text("Logout")
+                        .foregroundColor(.red)
+                        .frame(maxWidth: .infinity)
                 }
             }
             .navigationTitle("Profile Settings")

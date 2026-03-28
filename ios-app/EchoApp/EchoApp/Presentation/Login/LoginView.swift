@@ -7,6 +7,7 @@ struct LoginView: View {
     let sessionAdapter: SessionManager
     
     init(authAdapter: AuthRepository, sessionAdapter: SessionManager) {
+        self.authAdapter = authAdapter
         self.sessionAdapter = sessionAdapter
         _viewModel = StateObject(wrappedValue: LoginViewModel(authRepository: authAdapter, sessionManager: sessionAdapter))
     }

@@ -23,7 +23,7 @@ public class EchoApiAuthAdapter: AuthRepository {
                 if let token = data?.token {
                     continuation.resume(returning: .success(token))
                 } else {
-                    continuation.resume(returning: .failure(.operationFailed("Invalid API response format")))
+                    continuation.resume(returning: .failure(.operationFailed(self.invalidFormatError)))
                 }
             }
         }
@@ -50,7 +50,7 @@ public class EchoApiAuthAdapter: AuthRepository {
                 if let token = data?.token {
                     continuation.resume(returning: .success(token))
                 } else {
-                    continuation.resume(returning: .failure(.operationFailed("Invalid API response format")))
+                    continuation.resume(returning: .failure(.operationFailed(self.invalidFormatError)))
                 }
             }
         }

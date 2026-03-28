@@ -16,7 +16,7 @@ public class EchoApiUserAdapter: UserRepository {
         )
         
         return await withCheckedContinuation { continuation in
-            DefaultAPI.usersMePatch(updateProfileRequest: request) { data, error in
+            DefaultAPI.updateProfile(updateProfileRequest: request) { data, error in
                 if let error = error {
                     continuation.resume(returning: .failure(.networkError(error)))
                     return

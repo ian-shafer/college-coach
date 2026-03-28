@@ -3,9 +3,15 @@ import EchoAPI
 
 @main
 struct EchoAppApp: App {
-    @StateObject private var store = Store<Session>(initialState: KeychainSessionAdapter.shared.createSession())
+    let authAdapter = EchoApiAuthAdapter()
+    let userAdapter = EchoApiUserAdapter()
+    let sessionAdapter = KeychainSessionAdapter()
+    
+    @StateObject private var store: Store<Session>
     
     init() {
+        let localAdapter = KeychainSessionAdapter()
+        _store = StateObject(wrappedValue: Store<Session>(initialState: localAdapter.createSession()))
         EchoAPIAPI.customHeaders = [:] 
         EchoAPIAPI.basePath = AppConfig.apiBasePath
     }
