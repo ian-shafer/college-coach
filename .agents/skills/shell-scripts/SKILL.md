@@ -19,3 +19,5 @@ This skill dictates the universal structure and safety guidelines for all shell 
    - Every script MUST interpret inbound arguments and intercept `-h` or `--help` explicitly, invoking the `help()` function when triggered.
 5. **Dual Option Signatures**: 
    - Every option parsed by a script MUST uniformly support both a short definition and a long definition (e.g., `-p` or `--period`).
+6. **Strict Argument Bounding**: 
+   - Define exactly what positional parameters are accepted and reject all else. Use exact evaluations (e.g., `if [ "$#" -ne 1 ]; then`) instead of loose minimums (`-lt`) to catch surplus trailing arguments.

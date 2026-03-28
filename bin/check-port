@@ -18,8 +18,8 @@ while [[ "$#" -gt 0 ]]; do
     esac
 done
 
-if [ "$#" -lt 1 ]; then
-    help "Missing required argument: <SERVICE_NAME>"
+if [ "$#" -ne 1 ]; then
+    help "Expected exactly 1 argument: <SERVICE_NAME>"
 fi
 
 SERVICE_NAME="$1"
