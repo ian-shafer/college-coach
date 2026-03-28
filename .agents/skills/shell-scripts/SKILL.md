@@ -21,3 +21,5 @@ This skill dictates the universal structure and safety guidelines for all shell 
    - Every option parsed by a script MUST uniformly support both a short definition and a long definition (e.g., `-p` or `--period`).
 6. **Strict Argument Bounding**: 
    - Define exactly what positional parameters are accepted and reject all else. Use exact evaluations (e.g., `if [ "$#" -ne 1 ]; then`) instead of loose minimums (`-lt`) to catch surplus trailing arguments.
+7. **Semantic Output Streams**: 
+   - Standard execution logs and success messages MUST be piped to `stdout`. All failures, diagnostic errors, and invalid state messages MUST be routed to `stderr` (e.g., `echo "Error details" >&2`).

@@ -4,7 +4,7 @@ source "$(dirname "$0")/common"
 
 help() {
     if [ -n "$1" ]; then
-        echo "$1"
+        echo "$1" >&2
     fi
     echo "Usage: bin/start-daemon [-h|--help] <SERVICE_NAME> <PORT>"
     exit 1
@@ -32,7 +32,7 @@ PORT_FILE="var/run/$SERVICE_NAME.port"
 
 if [ -f "$PID_FILE" ]; then
     if bin/check-pid "$SERVICE_NAME" >/dev/null 2>&1; then
-        echo "Error: $SERVICE_NAME is already running."
+        echo "Error: $SERVICE_NAME is already running." >&2
         exit 1
     fi
 fi
@@ -50,7 +50,7 @@ if bin/wait-for 30 bin/check-port "$SERVICE_NAME" >/dev/null 2>&1; then
     echo "Successfully started $SERVICE_NAME (PID: $PID)"
     exit 0
 else
-    echo "Error: $SERVICE_NAME failed to start within 30 seconds."
+    echo "Error: $SERVICE_NAME failed to start within 30 seconds." >&2
     kill $PID 2>/dev/null || true
     exit 1
 fi
