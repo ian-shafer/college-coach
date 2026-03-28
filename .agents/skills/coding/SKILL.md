@@ -21,3 +21,7 @@ This skill establishes the universal logic constraints that apply across all pro
 3. **No Sentinel Nulls or Empty Strings** (Explicit Initialization)
    - NEVER use nulls or empty strings to represent an uninitialized state.
    - Prefer either initializing the variable with a concrete default value or using an explicit optional type (e.g., TypeScript's `string?` or Swift's `String?`).
+
+4. **Immutable State Returns** (Functional Patterns)
+   - When managing domain state or sessions, design models as immutable objects.
+   - Interface methods must return copies of these models containing mutated state (e.g., `func setToken() -> Session`) preventing opaque side-effects (`func setToken() -> Void`).

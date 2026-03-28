@@ -18,3 +18,6 @@
 ## Domain Mapping Behaviors
 1. **TypeSpec Timestamp Serialization**: TypeSpec natively parses `@doc("...") createdAt: utcDateTime` into `OffsetDateTime` string constructs globally, but pure Hexagonal Kotlin domains strictly rely on structural `java.time.Instant`. During HTTP Adapter routing extraction, correctly map the domain Instant utilizing `DateTimeFormatter.ISO_INSTANT.format(...)` to directly satisfy the DTO generation strings flawlessly.
 2. **Dynamic Error Interpolation**: Only *dynamic runtime variables* (like unique user IDs, email inputs) get wrapped aggressively inside `[]` bracket syntax structures (e.g. `[${email}] is already taken`). Do NOT wrap standard static identifiers (e.g. `First name cannot be blank` should strictly not have brackets). Never include sensitive system components (like plaintext passwords) within error outputs natively. No inline magic numbers. Always explicitly use class `companion object` constants natively.
+
+## State Management
+1. **Functional State Mutations**: All persistent state engines (like `Keychain` interfaces or Domain models tracking properties) must structure immutable objects preventing `Void` side-effects. State variables and endpoints must emit exhaustive representations or return formal `Result` payloads resolving operation success margins out in the open.
