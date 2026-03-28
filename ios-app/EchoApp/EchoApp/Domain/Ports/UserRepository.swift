@@ -1,19 +1,13 @@
 import Foundation
 
 public struct ProfileUpdate {
-    public let email: String?
-    public let password: String?
-    public let firstName: String?
-    public let lastName: String?
-    public let displayName: String?
+    public private(set) var email: String? = nil
+    public private(set) var password: String? = nil
+    public private(set) var firstName: String? = nil
+    public private(set) var lastName: String? = nil
+    public private(set) var displayName: String? = nil
     
-    public init(email: String? = nil, password: String? = nil, firstName: String? = nil, lastName: String? = nil, displayName: String? = nil) {
-        self.email = email
-        self.password = password
-        self.firstName = firstName
-        self.lastName = lastName
-        self.displayName = displayName
-    }
+    public init() {}
     
     public init(_ user: DomainUser) {
         self.email = user.email
@@ -24,23 +18,23 @@ public struct ProfileUpdate {
     }
 
     public func setEmail(_ email: String?) -> ProfileUpdate {
-        return ProfileUpdate(email: email, password: self.password, firstName: self.firstName, lastName: self.lastName, displayName: self.displayName)
+        var copy = self; copy.email = email; return copy
     }
     
     public func setPassword(_ password: String?) -> ProfileUpdate {
-        return ProfileUpdate(email: self.email, password: password, firstName: self.firstName, lastName: self.lastName, displayName: self.displayName)
+        var copy = self; copy.password = password; return copy
     }
 
     public func setFirstName(_ firstName: String?) -> ProfileUpdate {
-        return ProfileUpdate(email: self.email, password: self.password, firstName: firstName, lastName: self.lastName, displayName: self.displayName)
+        var copy = self; copy.firstName = firstName; return copy
     }
 
     public func setLastName(_ lastName: String?) -> ProfileUpdate {
-        return ProfileUpdate(email: self.email, password: self.password, firstName: self.firstName, lastName: lastName, displayName: self.displayName)
+        var copy = self; copy.lastName = lastName; return copy
     }
 
     public func setDisplayName(_ displayName: String?) -> ProfileUpdate {
-        return ProfileUpdate(email: self.email, password: self.password, firstName: self.firstName, lastName: self.lastName, displayName: displayName)
+        var copy = self; copy.displayName = displayName; return copy
     }
 
     public func build() -> ProfileUpdate {
