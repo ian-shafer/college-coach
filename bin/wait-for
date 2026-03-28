@@ -19,11 +19,14 @@ TIMEOUT_STR="$1"
 shift
 COMMAND=("$@")
 
-# Convert abstract timeout limits (e.g. 2m) purely into integer seconds
+# Convert timeout limit to integer seconds supporting s, m, h, d modifiers
 TIMEOUT_VAL="${TIMEOUT_STR%%[a-zA-Z]*}"
-if [[ "$TIMEOUT_STR" == *m* ]]; then
-    TIMEOUT_VAL=$((TIMEOUT_VAL * 60))
-fi
+case "$TIMEOUT_STR" in
+    *m*) TIMEOUT_VAL=$((TIMEOUT_VAL * 60)) ;;
+    *h*) TIMEOUT_VAL=$((TIMEOUT_VAL * 3600)) ;;
+    *d*) TIMEOUT_VAL=$((TIMEOUT_VAL * 86400)) ;;
+    *s*|*) ;; # seconds is the default unit
+esac
 
 SECONDS=0
 LAST_STATUS=1
@@ -31,11 +34,11 @@ LAST_STATUS=1
 while [ $SECONDS -lt $TIMEOUT_VAL ]; do
     "${COMMAND[@]}"
     LAST_STATUS=$?
-    
+
     if [ $LAST_STATUS -eq 0 ]; then
         exit 0
     fi
-    
+
     sleep "$PERIOD"
 done
 
