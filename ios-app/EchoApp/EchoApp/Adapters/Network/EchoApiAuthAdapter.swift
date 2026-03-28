@@ -3,19 +3,10 @@ import EchoAPI
 
 private extension Error {
     func toAuthError() -> AuthError {
-        if let apiError = self as? ErrorResponse {
-            switch apiError {
-            case .error(let statusCode, let data, _, let underlyingError):
-                if statusCode == 401 {
-                    return .operationFailed("HTTP [401]: Unauthorized credentials.")
-                }
-                if let data = data, let stringData = String(data: data, encoding: .utf8) {
-                    return .operationFailed("HTTP [\(statusCode)]: \(stringData)")
-                }
-                return .networkError(underlyingError)
-            }
+        switch self.parseEchoApiError(unauthorizedMessage: "HTTP [401]: Unauthorized credentials.") {
+        case .message(let msg): return .operationFailed(msg)
+        case .network(let err): return .networkError(err)
         }
-        return .networkError(self)
     }
 }
 
