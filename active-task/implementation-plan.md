@@ -42,6 +42,14 @@ This architecture complies with **Hexagonal Architecture (Ports and Adapters)** 
 #### [MODIFY] ios-app/EchoApp/EchoApp/ContentView.swift
 - Route structural core layouts mapping against `SessionState` availability identifiers.
 
+### 4. Spec-Driven Development (SDD) Anchors
+#### [NEW] ios-app/EchoApp/EchoApp/Domain/SPEC.md
+- Document the rigid boundaries of the Domain module ensuring zero external framework imports.
+#### [NEW] ios-app/EchoApp/EchoApp/Adapters/SPEC.md
+- Formalize the layer responsibilities declaring how networking and persistence must conform to internal Ports.
+#### [NEW] ios-app/EchoApp/EchoApp/Presentation/SPEC.md
+- Establish the View/ViewModel constraints bounding SwiftUI rendering to Hexagonal Use Cases and explicitly blocking `EchoAPI` dependencies.
+
 ## 🧪 Verification Plan
 ### Compiler Bound Assurance
 - Assert `$ grep -r "import EchoAPI" ios-app/EchoApp/EchoApp/Presentation` evaluates empty returning no architectural boundary infringements.
