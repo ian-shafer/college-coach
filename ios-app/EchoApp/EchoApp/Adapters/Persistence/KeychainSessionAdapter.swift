@@ -1,5 +1,6 @@
 import Foundation
 import Security
+import EchoAPI
 
 public class KeychainSessionAdapter: SessionManager {
     private let tokenKey = "com.echoapp.jwt.token"
@@ -18,6 +19,7 @@ public class KeychainSessionAdapter: SessionManager {
         let status = SecItemCopyMatching(query as CFDictionary, &dataTypeRef)
         
         if status == errSecSuccess, let data = dataTypeRef as? Data, let token = String(data: data, encoding: .utf8) {
+            EchoAPIAPI.customHeaders["Authorization"] = "Bearer \(token)"
             return Session().setToken(token).build()
         }
         return Session().build()
@@ -37,6 +39,7 @@ public class KeychainSessionAdapter: SessionManager {
         SecItemDelete(query as CFDictionary)
         SecItemAdd(query as CFDictionary, nil)
         
+        EchoAPIAPI.customHeaders["Authorization"] = "Bearer \(token)"
         return Session().setToken(token).build()
     }
     
@@ -47,6 +50,7 @@ public class KeychainSessionAdapter: SessionManager {
         ]
         
         SecItemDelete(query as CFDictionary)
+        EchoAPIAPI.customHeaders.removeValue(forKey: "Authorization")
         return Session().build()
     }
 }
