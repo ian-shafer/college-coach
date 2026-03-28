@@ -6,13 +6,16 @@
 
 ## Step 2: Establish the Generic Daemon Engine Core
 **SDD Traceability:** Part 2, Generic Daemon Engine Requirement, Edge Cases 1 & 2.
-- Author `bin/start-daemon`. Accept `$SERVICE_NAME`, `$COMMAND`, and `$PORT`. Trigger `mkdir -p var/run var/log` here to prevent unnecessary global side-effects in `common`. Background the execution via `&`, route logs explicitly to `var/log/$SERVICE_NAME.log`, map `$!` into `var/run/$SERVICE_NAME.pid`, and loop `nc -z localhost $PORT` enforcing a `30s` timeout barrier to catch boot failures.
-- Author `bin/stop-daemon`. Verify `var/run/$SERVICE_NAME.pid` exists and exit gracefully if missing. Read the PID, signal `kill -15 $PID`, loop invoking `bin/check-daemon $SERVICE_NAME` awaiting exit completion, and delete the `.pid` file.
-- Author `bin/check-daemon`. Verify `.pid` file exists (emit `STOPPED (No PID file)` if missing). Read the `$PID` mapping, assert `kill -0 $PID`, and emit standard text formats `RUNNING (PID X)` or `STOPPED (Stale PID)`.
+- Author `bin/start-daemon`. Accept `$SERVICE_NAME`, `$COMMAND`, and `$PORT`. Trigger `mkdir -p var/run var/log` to isolate side-effects. Map `$PORT` securely into `var/run/$SERVICE_NAME.port`. Background the daemon passing `$PORT` natively via environment paths, write logs to `var/log/$SERVICE_NAME.log`, extract `$!` into `var/run/$SERVICE_NAME.pid`, and cleanly loop `bin/check-port $SERVICE_NAME` enforcing a `30s` timeout barrier.
+- Author `bin/stop-daemon`. Verify `var/run/$SERVICE_NAME.pid` exists and exit if missing. Signal `kill -15 $PID` then loop `bin/check-pid` sequentially until the exit process terminates completely. Finally, clean up both the `.pid` and `.port` cache files.
+- Author `bin/check-pid`. Read `var/run/$SERVICE_NAME.pid` dynamically, invoke `kill -0 $PID`, and emit specific formatted responses: `RUNNING (PID X)` or `STOPPED`.
+- Author `bin/check-port`. Read `var/run/$SERVICE_NAME.port` dynamically, execute `nc -z localhost $PORT` effectively, and emit specific formatted terminal strings reporting local port latency values.
+- Author `bin/check-daemon`. Safely unify the evaluation process by executing both sub-routines sequentially: `bin/check-pid $SERVICE_NAME && bin/check-port $SERVICE_NAME`.
 
 ## Step 3: Implement Thin Wrappers for `rest-server`
 **SDD Traceability:** Success Criteria 1-5, Orphaned Docker Bindings Edge Case.
-- Author `bin/start-rest-server`. Strip complex payloads and invoke `bin/start-daemon "rest-server" "docker compose up rest-server" "8080"` bridging Docker wrapper host layers.
+- Author `bin/start-rest-server`. Strip standalone logic and exclusively invoke `bin/start-daemon "rest-server" "docker compose up rest-server" "8080"` cleanly.
+- Update `docker-compose.yml` and `application.conf` directly to map the incoming executing `$PORT` environmental variable fundamentally all the way through the Docker perimeter layer down explicitly to the Kotlin inner Ktor mapping.
 - Author `bin/stop-rest-server`. Wrap calls to `bin/stop-daemon "rest-server"`.
 - Author `bin/restart-rest-server`. Sequential execution: `bin/stop-rest-server && bin/start-rest-server`.
 - Author `bin/check-rest-server`. Execute `bin/check-daemon "rest-server"`.

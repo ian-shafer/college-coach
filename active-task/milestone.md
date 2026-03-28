@@ -6,7 +6,7 @@ This milestone reorganizes the `bin/` scripts to follow standard Unix daemon sem
 - The `start` script blocks execution until the service is ready to serve requests. This could be done by pinging the host port (e.g. `localhost:8080`) until the service responds.
 - The `stop` script identifies the tracked PID, sends a termination signal, and loops until the process is terminated (it should use the `check` script for this).
 - The `restart` script delegates to sequential `stop` and `start` operations.
-- The `check` script evaluates the saved PID using `kill -0` to ascertain status safely.
+- The `check` script is split cleanly into distinct `check-pid` (verifies the saved PID using `kill -0`) and `check-port` (verifies network readiness using `nc -z`). The parent `check` script safely delegates validation to both primitives simultaneously. The target port MUST fundamentally be saved locally to `var/run/[executable].port` and securely wired through all the way down to the underlying Kotlin Ktor backend.
 - An SDD Context Anchor at `bin/SPEC.md` documents this tracking environment.
 - **Generic Daemon Engine**: Core logic must exist in foundational scripts (`start-daemon`, `stop-daemon`, `check-daemon`). Executable-specific files (e.g., `start-rest-server`) will act as thin wrappers that simply invoke these shared foundational scripts (e.g., `start-daemon rest-server`).
 
