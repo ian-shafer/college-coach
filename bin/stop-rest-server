@@ -1,4 +1,3 @@
 #!/bin/bash
 source "$(dirname "$0")/common"
-bin/stop-rest-server
-bin/start-rest-server
+bin/stop-daemon "rest-server"

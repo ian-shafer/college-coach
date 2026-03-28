@@ -1,5 +1,3 @@
 #!/bin/bash
 source "$(dirname "$0")/common"
-
-echo "Starting the Ktor REST server via Docker Compose..."
-docker compose up rest-server
+bin/start-daemon "rest-server" "8080"
