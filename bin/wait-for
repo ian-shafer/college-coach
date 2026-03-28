@@ -16,6 +16,10 @@ if [ "$#" -lt 2 ]; then
 fi
 
 TIMEOUT_STR="$1"
+if [[ ! "$TIMEOUT_STR" =~ ^[0-9]+[smhd]?$ ]]; then
+    echo "Error: Invalid timeout format [$TIMEOUT_STR]. Expected a number optionally followed by s, m, h, or d (e.g., 30, 30s, 2m)."
+    exit 1
+fi
 shift
 COMMAND=("$@")
 
