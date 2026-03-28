@@ -64,6 +64,9 @@ Queue-Based Async: Never perform long-running tasks (emails, PDF generation) dur
 
 Statelessness: The application layer must be entirely stateless to allow for horizontal scaling.
 
+4. **Local Directory Specifications (SDD Context Anchors)**
+Every significant architectural directory (e.g., `domain/`, `adapters/`, specific feature modules) MUST contain a `SPEC.md` file. This file acts as a localized Spec-Driven Development anchor natively, explicitly detailing the exact purpose, strict business rules, and structural boundaries of the code natively within that specific directory. Any AI agent operating in this repository MUST fiercely prioritize reading this local `SPEC.md` file first to rapidly acquire localized context before scaffolding or modifying any logic within that directory.
+
 ## Planning & Implementation
 1. **Active Task Lifecycle:** The current task is always specified in the `/active-task` directory. **Phase Transition Protocol:** To formally transition between ANY two phases in the lifecycle, the agent MUST explicitly state two things: (1) what phase we are currently in, and (2) what the next phase is. Furthermore, the agent MUST present a highly structured SDD Summary containing: 🎯 **Key Decisions & Rationale**, 🔍 **Critical Items to Review**, and 📊 **Milestone Progress** (e.g., "Phase 3 of 7 Complete"). The agent MUST then completely halt execution and wait for the architect's explicit approval containing the exact string `LGTM` (e.g., `LGTM. On to the next phase!`). The agent absolutely cannot proceed to prioritize the next phase without this explicit `LGTM` authorization.
    * **Phase 1: Author the Milestone Definition (`active-task/milestone.md`)**:
