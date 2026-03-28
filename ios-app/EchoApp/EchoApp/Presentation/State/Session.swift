@@ -2,21 +2,21 @@ import Foundation
 import Combine
 
 @MainActor
-public class SessionState: ObservableObject {
-    @Published public var session: Session
+public class Session: ObservableObject {
+    @Published public var auth: AuthSession
     
     private let sessionManager: SessionManager
     
     public init(sessionManager: SessionManager) {
         self.sessionManager = sessionManager
-        self.session = sessionManager.createSession()
+        self.auth = sessionManager.createSession()
     }
     
     public func login(token: String) {
-        self.session = sessionManager.setToken(self.session, token: token)
+        self.auth = sessionManager.setToken(self.auth, token: token)
     }
     
     public func logout() {
-        self.session = sessionManager.logout(self.session)
+        self.auth = sessionManager.logout(self.auth)
     }
 }

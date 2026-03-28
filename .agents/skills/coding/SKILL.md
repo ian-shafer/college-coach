@@ -25,3 +25,7 @@ This skill establishes the universal logic constraints that apply across all pro
 4. **Immutable State Returns** (Functional Patterns)
    - When managing domain state or sessions, design models as immutable objects.
    - Interface methods must return copies of these models containing mutated state (e.g., `func setToken() -> Session`) preventing opaque side-effects (`func setToken() -> Void`).
+
+5. **Avoid Metasyntactic Naming** (Concrete Identifiers)
+   - Do not append ambiguous filler words like `State`, `Data`, or `Info` onto entity names.
+   - Class and variable constructs must evaluate clear structural bounds directly (e.g., use `Session` instead of `SessionState`).

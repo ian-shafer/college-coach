@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct LoginView: View {
-    @EnvironmentObject var sessionState: SessionState
+    @EnvironmentObject var session: Session
     @StateObject private var viewModel: LoginViewModel
     let authAdapter: AuthRepository
     
@@ -50,7 +50,7 @@ struct LoginView: View {
                 
                 Section {
                     Button(action: {
-                        viewModel.login(sessionState: sessionState)
+                        viewModel.login(session: session)
                     }) {
                         Text(viewModel.isLoading ? "Authenticating..." : "Login")
                             .bold()

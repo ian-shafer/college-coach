@@ -44,7 +44,7 @@ public class RegistrationViewModel: ObservableObject {
         return fieldErrors.isEmpty
     }
     
-    public func register(sessionState: SessionState) {
+    public func register(session: Session) {
         guard validate() else { return }
         isLoading = true
         
@@ -71,7 +71,7 @@ public class RegistrationViewModel: ObservableObject {
                 let token = try await authRepository.register(profile: profile)
                 self.isLoading = false
                 self.isRegistered = true
-                sessionState.login(token: token)
+                session.login(token: token)
             } catch {
                 self.isLoading = false
                 self.handleError(error)

@@ -30,7 +30,7 @@ public class LoginViewModel: ObservableObject {
         return fieldErrors.isEmpty
     }
     
-    public func login(sessionState: SessionState) {
+    public func login(session: Session) {
         guard validate() else { return }
         isLoading = true
         
@@ -43,7 +43,7 @@ public class LoginViewModel: ObservableObject {
             do {
                 let token = try await authRepository.login(credentials: credentials)
                 self.isLoading = false
-                sessionState.login(token: token)
+                session.login(token: token)
             } catch {
                 self.isLoading = false
                 self.handleError(error)

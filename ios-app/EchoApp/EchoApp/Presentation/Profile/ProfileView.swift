@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ProfileView: View {
-    @EnvironmentObject var sessionState: SessionState
+    @EnvironmentObject var session: Session
     @StateObject private var viewModel: ProfileViewModel
     
     init(userAdapter: UserRepository) {
@@ -43,7 +43,7 @@ struct ProfileView: View {
                 
                 Section {
                     Button(action: {
-                        sessionState.logout()
+                        session.logout()
                     }) {
                         Text("Logout")
                             .foregroundColor(.red)

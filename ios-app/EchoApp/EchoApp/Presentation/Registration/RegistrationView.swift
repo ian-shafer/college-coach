@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct RegistrationView: View {
-    @EnvironmentObject var sessionState: SessionState
+    @EnvironmentObject var session: Session
     @StateObject private var viewModel: RegistrationViewModel
     
     init(authAdapter: AuthRepository) {
@@ -73,7 +73,7 @@ struct RegistrationView: View {
             
             Section {
                 Button(action: {
-                    viewModel.register(sessionState: sessionState)
+                    viewModel.register(session: session)
                 }) {
                     Text(viewModel.isLoading ? "Registering..." : "Register")
                         .bold()
