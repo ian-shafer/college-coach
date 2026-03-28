@@ -1,7 +1,7 @@
 #!/bin/bash
 source "$(dirname "$0")/common"
 
-PERIOD=1
+PERIOD="1s"
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
@@ -11,18 +11,24 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 if [ "$#" -lt 2 ]; then
-    echo "Usage: bin/wait-for [--period seconds] <timeout> <command...>"
+    echo "Usage: bin/wait-for [--period duration] <timeout> <command...>"
     exit 1
 fi
 
-TIMEOUT_VAL="${1%s}"
+TIMEOUT_STR="$1"
 shift
 COMMAND=("$@")
 
-ELAPSED=0
+# Convert abstract timeout limits (e.g. 2m) purely into integer seconds
+TIMEOUT_VAL="${TIMEOUT_STR%%[a-zA-Z]*}"
+if [[ "$TIMEOUT_STR" == *m* ]]; then
+    TIMEOUT_VAL=$((TIMEOUT_VAL * 60))
+fi
+
+SECONDS=0
 LAST_STATUS=1
 
-while [ $ELAPSED -lt $TIMEOUT_VAL ]; do
+while [ $SECONDS -lt $TIMEOUT_VAL ]; do
     "${COMMAND[@]}"
     LAST_STATUS=$?
     
@@ -30,8 +36,7 @@ while [ $ELAPSED -lt $TIMEOUT_VAL ]; do
         exit 0
     fi
     
-    sleep $PERIOD
-    ELAPSED=$((ELAPSED + PERIOD))
+    sleep "$PERIOD"
 done
 
 exit $LAST_STATUS
