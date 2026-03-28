@@ -13,13 +13,13 @@ help() {
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         -h|--help) help ;;
-        -*) help "Unknown option $1" ;;
+        -*) help "Unknown option [$1]" ;;
         *) break ;;
     esac
 done
 
 if [ "$#" -gt 0 ]; then
-    help "Unexpected arguments provided."
+    help "Unexpected argument provided: [$1]"
 fi
 
 bin/stop-rest-server

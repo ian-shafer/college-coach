@@ -13,7 +13,7 @@ help() {
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         -h|--help) help ;;
-        -*) help "Unknown option $1" ;;
+        -*) help "Unknown option [$1]" ;;
         *) break ;;
     esac
 done
@@ -36,8 +36,9 @@ PID=$(cat "$PID_FILE")
 echo "Stopping $SERVICE_NAME (PID $PID)..."
 kill -15 "$PID" >/dev/null 2>&1 || true
 
-if ! bin/wait-for 30s bash -c "! bin/check-pid \"$SERVICE_NAME\" >/dev/null 2>&1"; then
-    echo "Error: $SERVICE_NAME (PID $PID) failed to stop within 30s." >&2
+WAIT_FOR_TIMEOUT=30s
+if ! bin/wait-for "$WAIT_FOR_TIMEOUT" bash -c "! bin/check-pid \"$SERVICE_NAME\" >/dev/null 2>&1"; then
+    echo "Error: $SERVICE_NAME (PID $PID) failed to stop within $WAIT_FOR_TIMEOUT." >&2
     exit 1
 fi
 
