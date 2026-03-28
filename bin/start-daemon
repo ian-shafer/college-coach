@@ -18,12 +18,12 @@ while [[ "$#" -gt 0 ]]; do
     esac
 done
 
+if [ "$#" -lt 2 ]; then
+    help "Missing required arguments: <SERVICE_NAME> <PORT>"
+fi
+
 SERVICE_NAME="$1"
 PORT="$2"
-
-if [ -z "$SERVICE_NAME" ] || [ -z "$PORT" ]; then
-    help
-fi
 
 mkdir -p var/run var/log
 

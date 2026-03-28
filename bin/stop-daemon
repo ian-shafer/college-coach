@@ -18,11 +18,11 @@ while [[ "$#" -gt 0 ]]; do
     esac
 done
 
-SERVICE_NAME="$1"
-
-if [ -z "$SERVICE_NAME" ]; then
-    help
+if [ "$#" -lt 1 ]; then
+    help "Missing required argument: <SERVICE_NAME>"
 fi
+
+SERVICE_NAME="$1"
 
 PID_FILE="var/run/$SERVICE_NAME.pid"
 PORT_FILE="var/run/$SERVICE_NAME.port"
