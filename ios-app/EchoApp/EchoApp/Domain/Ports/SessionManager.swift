@@ -1,12 +1,19 @@
 import Foundation
 
-public enum SessionError: Error {
-    case operationFailed(String)
-    case notFound
+public struct Session {
+    public let token: String?
+    
+    public var isAuthenticated: Bool {
+        return token != nil
+    }
+    
+    public init(token: String? = nil) {
+        self.token = token
+    }
 }
 
 public protocol SessionManager {
-    func saveToken(_ token: String) -> Result<Void, SessionError>
-    func getToken() -> Result<String, SessionError>
-    func deleteToken() -> Result<Void, SessionError>
+    func createSession() -> Session
+    func setToken(token: String) -> Session
+    func logout() -> Session
 }

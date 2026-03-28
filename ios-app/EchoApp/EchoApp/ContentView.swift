@@ -8,7 +8,7 @@ struct ContentView: View {
     let userAdapter = EchoApiUserAdapter()
     
     var body: some View {
-        if sessionState.isAuthenticated {
+        if sessionState.session.isAuthenticated {
             ProfileView(userAdapter: userAdapter)
         } else {
             LoginView(authAdapter: authAdapter)
