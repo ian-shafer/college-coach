@@ -65,17 +65,27 @@ Queue-Based Async: Never perform long-running tasks (emails, PDF generation) dur
 Statelessness: The application layer must be entirely stateless to allow for horizontal scaling.
 
 ## Planning & Implementation
-1. **Active Task Lifecycle:** The current task is always specified in the `/active-task` directory. **Phase Transition Protocol:** To formally transition between ANY two phases in the lifecycle, the agent MUST explicitly state two things: (1) what phase we are currently in, and (2) what the next phase is. The agent MUST then completely halt execution and wait for the architect's explicit approval containing the exact string `LGTM` (e.g., `LGTM. On to the next phase!`). The agent absolutely cannot proceed to prioritize the next phase without this explicit `LGTM` authorization.
+1. **Active Task Lifecycle:** The current task is always specified in the `/active-task` directory. **Phase Transition Protocol:** To formally transition between ANY two phases in the lifecycle, the agent MUST explicitly state two things: (1) what phase we are currently in, and (2) what the next phase is. Furthermore, the agent MUST present a highly structured SDD Summary containing: 🎯 **Key Decisions & Rationale**, 🔍 **Critical Items to Review**, and 📊 **Milestone Progress** (e.g., "Phase 3 of 7 Complete"). The agent MUST then completely halt execution and wait for the architect's explicit approval containing the exact string `LGTM` (e.g., `LGTM. On to the next phase!`). The agent absolutely cannot proceed to prioritize the next phase without this explicit `LGTM` authorization.
    * **Phase 1: Author the Milestone Definition (`active-task/milestone.md`)**:
      1. Check out a new `git branch` specifically named for the upcoming milestone.
      2. Define the high-level milestone. What will be different after this milestone is complete? What new features will be available to the user?
-     3. Identify the parts of the milestone (e.g., database, schema).
-     4. Go through each part identified and discuss/document the design.
-     5. Here's a template for the milestone doc:
+     3. **SDD Requirement**: The milestone definition MUST act as an Executable Spec. It must explicitly include **Measurable Success Criteria**, **Explicit Edge Cases**, and **Hard Dependencies** (features blocking the milestone).
+     4. Identify the parts of the milestone (e.g., database, schema).
+     5. Go through each part identified and discuss/document the design.
+     6. Here's a template for the milestone doc:
          ```
          **Milestone Template:**
          # Milestone: {milestone_name}
          {milestone_definition: paragraphs and lists explaining what is changing}
+         
+         ## Success Criteria
+         {measurable metrics of completion}
+
+         ## Edge Cases
+         {potential failures to consider}
+
+         ## Dependencies
+         {list of blocking features}
          
          # Part n: {part_name}
          {part_design: paragraphs and lists, maybe pseudo-code}
@@ -84,9 +94,10 @@ Statelessness: The application layer must be entirely stateless to allow for hor
    * **Phase 2: Review the Milestone Definition**:
      1. Review the milestone definition with fresh eyes to determine readiness. If the milestone definition is not clear, concise, and well-structured, edit it until it is.
    * **Phase 3: Implementation Plan (`active-task/implementation-plan.md`)**:
-     1. Discuss the steps for implementation. Always prefer smaller steps (e.g., Step 1: write a utility method. Step 2: use the method).
-     2. Steps must be ordered sequentially.
-     3. Adding dependencies (e.g., modifying `build.gradle.kts`) should never be its own standalone step, but rather considered a side-effect of the code requiring those libraries.
+     1. **SDD Traceability**: Every single functional step generated MUST explicitly trace back to a specific requirement natively outlined in the Phase 1 milestone. No orphaned code generation allowed.
+     2. Discuss the steps for implementation. Always prefer smaller steps (e.g., Step 1: write a utility method. Step 2: use the method).
+     3. Steps must be ordered sequentially.
+     4. Adding dependencies (e.g., modifying `build.gradle.kts`) should never be its own standalone step, but rather considered a side-effect of the code requiring those libraries.
    * **Phase 4: Implementation**: Implement, review, and submit each step sequentially as defined in the plan.
    * **Phase 5: Testing**: Test the milestone to ensure it works as expected.
    * **Phase 6: Review**: Review the milestone with fresh eyes to ensure it follows all laws and guidelines -- especially the laws defined in this document.
