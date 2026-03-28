@@ -65,7 +65,7 @@ Queue-Based Async: Never perform long-running tasks (emails, PDF generation) dur
 Statelessness: The application layer must be entirely stateless to allow for horizontal scaling.
 
 ## Planning & Implementation
-1. **Active Task Lifecycle:** The current task is always specified in the `/active-task` directory and follows the following lifecycle:
+1. **Active Task Lifecycle:** The current task is always specified in the `/active-task` directory. **Phase Transition Protocol:** To formally transition between ANY two phases in the lifecycle, the agent MUST explicitly state two things: (1) what phase we are currently in, and (2) what the next phase is. The agent MUST then completely halt execution and wait for the architect's explicit approval containing the exact string `LGTM` (e.g., `LGTM. On to the next phase!`). The agent absolutely cannot proceed to prioritize the next phase without this explicit `LGTM` authorization.
    * **Phase 1: Author the Milestone Definition (`active-task/milestone.md`)**:
      1. Check out a new `git branch` specifically named for the upcoming milestone.
      2. Define the high-level milestone. What will be different after this milestone is complete? What new features will be available to the user?
