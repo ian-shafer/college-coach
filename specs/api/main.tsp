@@ -82,3 +82,15 @@ op login(@body body: AuthRequest): AuthResponse | BadRequestResponse | Unauthori
 @route("/auth/logout")
 @post
 op logout(): void;
+
+model UpdateProfileRequest {
+  email?: string;
+  password?: string;
+  firstName?: string;
+  lastName?: string;
+  displayName?: string;
+}
+
+@route("/users/me")
+@patch
+op updateProfile(@body body: UpdateProfileRequest): User | BadRequestResponse | UnauthorizedResponse | ConflictResponse;

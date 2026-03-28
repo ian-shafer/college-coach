@@ -36,7 +36,7 @@ The LLM / Agent must always adhere to the following rules when designing or impl
 
 ## Error handling
 1. **Every Error Must be Handled:** Never "swallow" an error. When an error is detected, it must be either terminted properly by returning an error value or logging, or it must be propagated up the stack.
-2. **Clear and Concise Error Messages:** Error messages must be clear and concise. When generating error messages, always include as much pertinent information as possible to allow for easy debugging. Any dynamic values in error messages must be bracketed with `[` and `]` (e.g., `logError("Could not cd to [${path}]")` is better than `logError("Could not cd to $path")`).
+2. **Clear and Concise Error Messages:** Error messages must be clear and concise. When generating error messages, always include as much pertinent information as possible to allow for easy debugging. Any dynamic *runtime values* evaluated in error messages must be bracketed with `[` and `]` (e.g., `logError("Could not access path [${path}]")` is better than without brackets). Do NOT bracket static field identifiers. If a field fails a static validation without dynamic input (e.g. being empty), simply state the failure explicitly (e.g., `First name cannot be empty`). **Crucially, never inject sensitive dynamic values (like passwords) into error messages.**
 3. **Expected States are not Errors:** Expected use cases (e.g., duplicate emails or invalid credentials) should not be treated as errors. Instead, they should be handled gracefully and communicated clearly to the user.
 
 ## Code Formatting

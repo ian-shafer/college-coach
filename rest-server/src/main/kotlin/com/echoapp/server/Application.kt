@@ -11,8 +11,13 @@ import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
 import kotlinx.serialization.json.Json
 import com.echoapp.server.routes.authRoutes
+import com.echoapp.server.routes.userRoutes
+import com.echoapp.server.adapters.SqlUserRepository
+import com.echoapp.domain.ProfileValidator
 
 fun main(args: Array<String>) {
     io.ktor.server.netty.EngineMain.main(args)
@@ -45,8 +50,28 @@ fun Application.module() {
 
     val jwtService = com.echoapp.server.auth.JwtService(environment.config)
 
+    install(Authentication) {
+        jwt("auth-jwt") {
+            verifier(jwtService.verifier())
+            validate { credential ->
+                if (!credential.payload.getClaim("email").asString().isNullOrEmpty()) {
+                    JWTPrincipal(credential.payload)
+                } else {
+                    null
+                }
+            }
+            challenge { defaultScheme, realm ->
+                call.respond(HttpStatusCode.Unauthorized, com.echoapp.models.ErrorResponse(messages = listOf("Unauthorized access")))
+            }
+        }
+    }
+
     routing {
+        val userRepository = SqlUserRepository()
+        val profileValidator = ProfileValidator()
+
         authRoutes(jwtService)
+        userRoutes(userRepository, profileValidator)
 
         post("/echo") {
             val requestMessage = call.receive<EchoMessage>()
