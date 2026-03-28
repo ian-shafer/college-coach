@@ -1,4 +1,26 @@
 #!/bin/bash
+set -e
 source "$(dirname "$0")/common"
+
+help() {
+    if [ -n "$1" ]; then
+        echo "$1"
+    fi
+    echo "Usage: bin/restart-rest-server [-h|--help]"
+    exit 1
+}
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        -h|--help) help ;;
+        -*) help "Unknown option $1" ;;
+        *) break ;;
+    esac
+done
+
+if [ "$#" -gt 0 ]; then
+    help "Unexpected arguments provided."
+fi
+
 bin/stop-rest-server
 bin/start-rest-server
