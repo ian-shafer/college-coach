@@ -6,7 +6,7 @@
 
 ## Step 2: Establish the Generic Daemon Engine Core
 **SDD Traceability:** Part 2, Generic Daemon Engine Requirement, Edge Cases 1 & 2.
-- Author `bin/start-daemon`. Accept `$SERVICE_NAME`, an exact target `$COMMAND` (the arbitrary executable string like `"docker compose up rest-server"`), and `$PORT`. Trigger `mkdir -p var/run var/log` to isolate side-effects. Map `$PORT` securely into `var/run/$SERVICE_NAME.port`. Execute `$COMMAND` in the background passing `$PORT` via environment paths, route logs to `var/log/$SERVICE_NAME.log`, extract `$!` into `var/run/$SERVICE_NAME.pid`, and cleanly loop `bin/check-port $SERVICE_NAME` enforcing a `30s` timeout barrier.
+- Author `bin/start-daemon`. Accept `$SERVICE_NAME` and `$PORT`. Trigger `mkdir -p var/run var/log` to isolate side-effects. Map `$PORT` securely into `var/run/$SERVICE_NAME.port`. Execute `docker compose up $SERVICE_NAME` in the background passing `$PORT` natively via environment variables, route logs to `var/log/$SERVICE_NAME.log`, extract `$!` into `var/run/$SERVICE_NAME.pid`, and cleanly loop `bin/check-port $SERVICE_NAME` enforcing a `30s` timeout barrier.
 - Author `bin/stop-daemon`. Verify `var/run/$SERVICE_NAME.pid` exists and exit if missing. Signal `kill -15 $PID` then loop `bin/check-daemon $SERVICE_NAME` sequentially until it fails (process is dead). Finally, clean up both the `.pid` and `.port` files.
 - Author `bin/check-pid`. Accept `$SERVICE_NAME`. Verify `var/run/$SERVICE_NAME.pid` exists (exit indicating missing process if not). Read the PID, invoke `kill -0 $PID`, and emit specific responses: `RUNNING (PID X)` or `STOPPED`.
 - Author `bin/check-port`. Accept `$SERVICE_NAME`. Verify `var/run/$SERVICE_NAME.port` exists (exit indicating missing port if not). Read the port, execute `nc -z localhost $PORT`, and emit port readiness status.
@@ -14,7 +14,7 @@
 
 ## Step 3: Implement Thin Wrappers for `rest-server`
 **SDD Traceability:** Success Criteria 1-5, Orphaned Docker Bindings Edge Case.
-- Author `bin/start-rest-server`. Strip standalone logic and exclusively invoke `bin/start-daemon "rest-server" "docker compose up rest-server" "8080"` cleanly.
+- Author `bin/start-rest-server`. Strip standalone logic and exclusively invoke `bin/start-daemon "rest-server" "8080"` cleanly.
 - Update `docker-compose.yml` and `application.conf` directly to map the incoming executing `$PORT` environmental variable fundamentally all the way through the Docker perimeter layer down explicitly to the Kotlin inner Ktor mapping.
 - Author `bin/stop-rest-server`. Wrap calls to `bin/stop-daemon "rest-server"`.
 - Author `bin/restart-rest-server`. Sequential execution: `bin/stop-rest-server && bin/start-rest-server`.
