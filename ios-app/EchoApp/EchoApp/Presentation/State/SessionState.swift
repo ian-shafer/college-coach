@@ -9,16 +9,35 @@ public class SessionState: ObservableObject {
     
     public init(sessionManager: SessionManager) {
         self.sessionManager = sessionManager
-        self.isAuthenticated = sessionManager.getToken() != nil
+        
+        switch sessionManager.getToken() {
+        case .success:
+            self.isAuthenticated = true
+        case .failure:
+            self.isAuthenticated = false
+        }
     }
     
     public func login(token: String) {
-        sessionManager.saveToken(token)
-        isAuthenticated = true
+        let result = sessionManager.saveToken(token)
+        switch result {
+        case .success:
+            isAuthenticated = true
+        case .failure(let error):
+            // Handle logging or alerting
+            isAuthenticated = false
+            print("Login SessionError: \(error)")
+        }
     }
     
     public func logout() {
-        sessionManager.deleteToken()
-        isAuthenticated = false
+        let result = sessionManager.deleteToken()
+        switch result {
+        case .success:
+            isAuthenticated = false
+        case .failure(let error):
+            isAuthenticated = false
+            print("Logout SessionError: \(error)")
+        }
     }
 }
