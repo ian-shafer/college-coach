@@ -59,9 +59,16 @@ public struct DomainUser {
     public func build() -> DomainUser { return self }
 }
 
-public enum UserError: Error {
+public enum UserError: LocalizedError {
     case operationFailed(String)
     case networkError(Error)
+    
+    public var errorDescription: String? {
+        switch self {
+        case .operationFailed(let msg): return msg
+        case .networkError(let err): return err.localizedDescription
+        }
+    }
 }
 
 public protocol UserRepository {

@@ -28,9 +28,16 @@ public struct RegisterProfile {
     public func build() -> RegisterProfile { return self }
 }
 
-public enum AuthError: Error {
+public enum AuthError: LocalizedError {
     case operationFailed(String)
     case networkError(Error)
+    
+    public var errorDescription: String? {
+        switch self {
+        case .operationFailed(let msg): return msg
+        case .networkError(let err): return err.localizedDescription
+        }
+    }
 }
 
 public protocol AuthRepository {
