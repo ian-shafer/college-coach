@@ -15,6 +15,7 @@ Contains the core Unix-based executable shell scripts responsible for managing a
 
 ## 🔄 State & Data Flow
 - **Data Mutability:** State tracks into persistent cache files mapping `.pid` and `.port` states inside isolated `var/run/` directories.
+- **Execution Validation:** Health and operational status evaluations rely on standard Unix exit status codes (e.g., evaluating `$?`) rather than fragile text parsing or scraping script output strings.
 
 ## ⚠️ Strict Constraints & Known Gotchas
 - **No Unnecessary Side-Effects**: Execution side-effects (`mkdir`, writing `.pid` objects) must reside inside target files like `start-daemon`. Global inclusions (like `common`) omit active execution commands.

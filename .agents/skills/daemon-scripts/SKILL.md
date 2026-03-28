@@ -33,3 +33,5 @@ bin/start-daemon "rest-server" "8080"
 5. **The MacOS Docker Edge Case**: 
    - Docker Desktop on MacOS runs inside a hidden VM. Running `kill -0` on the raw container Linux PID fails on the host Mac bash. 
    - **Solution**: Background the host execution string (e.g., `docker compose up ... &`) and trap its bash shell ID via `$!` to use as the persistent mapping PID. The Docker Compose framework routes termination signals down through the VM layer for you.
+6. **Evaluate Exit Codes, Not Text**: 
+   - Always evaluate robust Unix exit status codes (`$?`) to determine success or failure states rather than utilizing `grep` or parsing raw standard output.
