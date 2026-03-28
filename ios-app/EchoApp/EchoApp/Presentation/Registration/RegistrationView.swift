@@ -1,11 +1,11 @@
 import SwiftUI
 
 struct RegistrationView: View {
-    @EnvironmentObject var session: Session
+    @EnvironmentObject var store: Store<Session>
     @StateObject private var viewModel: RegistrationViewModel
     
-    init(authAdapter: AuthRepository) {
-        _viewModel = StateObject(wrappedValue: RegistrationViewModel(authRepository: authAdapter))
+    init(authAdapter: AuthRepository, sessionAdapter: SessionManager) {
+        _viewModel = StateObject(wrappedValue: RegistrationViewModel(authRepository: authAdapter, sessionManager: sessionAdapter))
     }
     
     var body: some View {
@@ -73,7 +73,7 @@ struct RegistrationView: View {
             
             Section {
                 Button(action: {
-                    viewModel.register(session: session)
+                    viewModel.register(store: store)
                 }) {
                     Text(viewModel.isLoading ? "Registering..." : "Register")
                         .bold()

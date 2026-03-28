@@ -11,9 +11,11 @@ public class LoginViewModel: ObservableObject {
     @Published public var isLoading = false
     
     private let authRepository: AuthRepository
+    private let sessionManager: SessionManager
     
-    public init(authRepository: AuthRepository) {
+    public init(authRepository: AuthRepository, sessionManager: SessionManager) {
         self.authRepository = authRepository
+        self.sessionManager = sessionManager
     }
     
     public func validate() -> Bool {
@@ -30,7 +32,7 @@ public class LoginViewModel: ObservableObject {
         return fieldErrors.isEmpty
     }
     
-    public func login(session: Session) {
+    public func login(store: Store<Session>) {
         guard validate() else { return }
         isLoading = true
         
@@ -43,7 +45,7 @@ public class LoginViewModel: ObservableObject {
             do {
                 let token = try await authRepository.login(credentials: credentials)
                 self.isLoading = false
-                session.login(token: token)
+                store.state = self.sessionManager.setToken(store.state, token: token)
             } catch {
                 self.isLoading = false
                 self.handleError(error)

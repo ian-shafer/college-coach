@@ -1,11 +1,11 @@
 import SwiftUI
 
 struct ProfileView: View {
-    @EnvironmentObject var session: Session
+    @EnvironmentObject var store: Store<Session>
     @StateObject private var viewModel: ProfileViewModel
     
-    init(userAdapter: UserRepository) {
-        _viewModel = StateObject(wrappedValue: ProfileViewModel(userRepository: userAdapter))
+    init(userAdapter: UserRepository, sessionAdapter: SessionManager) {
+        _viewModel = StateObject(wrappedValue: ProfileViewModel(userRepository: userAdapter, sessionManager: sessionAdapter))
     }
     
     var body: some View {
@@ -41,9 +41,8 @@ struct ProfileView: View {
                     .disabled(viewModel.isLoading)
                 }
                 
-                Section {
                     Button(action: {
-                        session.logout()
+                        viewModel.logout(store: store)
                     }) {
                         Text("Logout")
                             .foregroundColor(.red)

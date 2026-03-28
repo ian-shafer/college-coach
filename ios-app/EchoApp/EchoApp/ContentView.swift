@@ -1,22 +1,23 @@
 import SwiftUI
 
 struct ContentView: View {
-    @EnvironmentObject var session: Session
-    
+    @EnvironmentObject var store: Store<Session>
+
     // Concrete adapters initialized matching dependency injection roots.
     let authAdapter = EchoApiAuthAdapter()
     let userAdapter = EchoApiUserAdapter()
+    let sessionAdapter = KeychainSessionAdapter.shared
     
     var body: some View {
-        if session.auth.isAuthenticated {
-            ProfileView(userAdapter: userAdapter)
+        if store.state.isAuthenticated {
+            ProfileView(userAdapter: userAdapter, sessionAdapter: sessionAdapter)
         } else {
-            LoginView(authAdapter: authAdapter)
+            LoginView(authAdapter: authAdapter, sessionAdapter: sessionAdapter)
         }
     }
 }
 
 #Preview {
     ContentView()
-        .environmentObject(Session(sessionManager: KeychainSessionAdapter.shared))
+        .environmentObject(Store<Session>(initialState: KeychainSessionAdapter.shared.createSession()))
 }

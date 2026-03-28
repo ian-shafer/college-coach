@@ -1,13 +1,14 @@
 import SwiftUI
 
 struct LoginView: View {
-    @EnvironmentObject var session: Session
+    @EnvironmentObject var store: Store<Session>
     @StateObject private var viewModel: LoginViewModel
     let authAdapter: AuthRepository
+    let sessionAdapter: SessionManager
     
-    init(authAdapter: AuthRepository) {
-        self.authAdapter = authAdapter
-        _viewModel = StateObject(wrappedValue: LoginViewModel(authRepository: authAdapter))
+    init(authAdapter: AuthRepository, sessionAdapter: SessionManager) {
+        self.sessionAdapter = sessionAdapter
+        _viewModel = StateObject(wrappedValue: LoginViewModel(authRepository: authAdapter, sessionManager: sessionAdapter))
     }
     
     var body: some View {
@@ -50,7 +51,7 @@ struct LoginView: View {
                 
                 Section {
                     Button(action: {
-                        viewModel.login(session: session)
+                        viewModel.login(store: store)
                     }) {
                         Text(viewModel.isLoading ? "Authenticating..." : "Login")
                             .bold()
@@ -62,7 +63,7 @@ struct LoginView: View {
                 }
                 
                 Section {
-                    NavigationLink(destination: RegistrationView(authAdapter: authAdapter)) {
+                    NavigationLink(destination: RegistrationView(authAdapter: authAdapter, sessionAdapter: sessionAdapter)) {
                         Text("Don't have an account? Register")
                             .frame(maxWidth: .infinity)
                             .foregroundColor(.blue)

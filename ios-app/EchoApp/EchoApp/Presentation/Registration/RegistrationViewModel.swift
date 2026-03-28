@@ -16,9 +16,11 @@ public class RegistrationViewModel: ObservableObject {
     @Published public var isRegistered = false
     
     private let authRepository: AuthRepository
+    private let sessionManager: SessionManager
     
-    public init(authRepository: AuthRepository) {
+    public init(authRepository: AuthRepository, sessionManager: SessionManager) {
         self.authRepository = authRepository
+        self.sessionManager = sessionManager
     }
     
     public func validate() -> Bool {
@@ -44,7 +46,7 @@ public class RegistrationViewModel: ObservableObject {
         return fieldErrors.isEmpty
     }
     
-    public func register(session: Session) {
+    public func register(store: Store<Session>) {
         guard validate() else { return }
         isLoading = true
         
@@ -71,7 +73,7 @@ public class RegistrationViewModel: ObservableObject {
                 let token = try await authRepository.register(profile: profile)
                 self.isLoading = false
                 self.isRegistered = true
-                session.login(token: token)
+                store.state = self.sessionManager.setToken(store.state, token: token)
             } catch {
                 self.isLoading = false
                 self.handleError(error)

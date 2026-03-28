@@ -3,7 +3,7 @@ import EchoAPI
 
 @main
 struct EchoAppApp: App {
-    @StateObject private var session = Session(sessionManager: KeychainSessionAdapter.shared)
+    @StateObject private var store = Store<Session>(initialState: KeychainSessionAdapter.shared.createSession())
     
     init() {
         EchoAPIAPI.customHeaders = [:] 
@@ -13,7 +13,7 @@ struct EchoAppApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environmentObject(session)
+                .environmentObject(store)
         }
     }
 }

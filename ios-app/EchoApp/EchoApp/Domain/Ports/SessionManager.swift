@@ -1,6 +1,6 @@
 import Foundation
 
-public struct AuthSession {
+public struct Session {
     public let token: String?
     
     public var isAuthenticated: Bool {
@@ -13,7 +13,7 @@ public struct AuthSession {
 }
 
 public protocol SessionManager {
-    func createSession() -> AuthSession
-    func setToken(_ session: AuthSession, token: String) -> AuthSession
-    func logout(_ session: AuthSession) -> AuthSession
+    func createSession() -> Session
+    func setToken(_ session: Session, token: String) -> Session
+    func logout(_ session: Session) -> Session
 }

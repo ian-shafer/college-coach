@@ -14,9 +14,11 @@ public class ProfileViewModel: ObservableObject {
     @Published public var isUpdated = false
     
     private let userRepository: UserRepository
+    private let sessionManager: SessionManager
     
-    public init(userRepository: UserRepository) {
+    public init(userRepository: UserRepository, sessionManager: SessionManager) {
         self.userRepository = userRepository
+        self.sessionManager = sessionManager
     }
     
     public func updateProfile() {
@@ -51,5 +53,9 @@ public class ProfileViewModel: ObservableObject {
     
     private func handleError(_ error: Error) {
         self.globalMessages = [error.localizedDescription]
+    }
+    
+    public func logout(store: Store<Session>) {
+        store.state = sessionManager.logout(store.state)
     }
 }
