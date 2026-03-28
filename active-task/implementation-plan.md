@@ -7,8 +7,8 @@
 ## Step 2: Establish the Generic Daemon Engine Core
 **SDD Traceability:** Part 2, Generic Daemon Engine Requirement, Edge Cases 1 & 2.
 - Author `bin/start-daemon`. Accept `$SERVICE_NAME`, `$COMMAND`, and `$PORT`. Trigger `mkdir -p var/run var/log` here to prevent unnecessary global side-effects in `common`. Background the execution via `&`, route logs explicitly to `var/log/$SERVICE_NAME.log`, map `$!` into `var/run/$SERVICE_NAME.pid`, and loop `nc -z localhost $PORT` enforcing a `30s` timeout barrier to catch boot failures.
-- Author `bin/stop-daemon`. Read the PID from `var/run/$SERVICE_NAME.pid`, signal `kill -15 $PID`, loop `kill -0 $PID` awaiting exit completion, and delete the `.pid` file.
-- Author `bin/check-daemon`. Read the `$PID` mapping, assert `kill -0 $PID`, and emit standard text formats `RUNNING (PID X)` or `STOPPED (Stale PID)` without masking background states.
+- Author `bin/stop-daemon`. Verify `var/run/$SERVICE_NAME.pid` exists and exit gracefully if missing. Read the PID, signal `kill -15 $PID`, loop `kill -0 $PID` awaiting exit completion, and delete the `.pid` file.
+- Author `bin/check-daemon`. Verify `.pid` file exists (emit `STOPPED (No PID file)` if missing). Read the `$PID` mapping, assert `kill -0 $PID`, and emit standard text formats `RUNNING (PID X)` or `STOPPED (Stale PID)`.
 
 ## Step 3: Implement Thin Wrappers for `rest-server`
 **SDD Traceability:** Success Criteria 1-5, Orphaned Docker Bindings Edge Case.
