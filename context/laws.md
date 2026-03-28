@@ -26,6 +26,7 @@ The LLM / Agent must always adhere to the following rules when designing or impl
 3. **Single Responsibility:** Each function, class, and module should have a single responsibility. It should do one thing and do it well.
 4. **No Magic Values:** Never use hard-coded "magic" numbers or strings directly inline. Always extract them strictly into named arguments, functional parameters, class constants, or constants.
 5. **Standard and Consistent Verbs and Nouns:** Use standard and consistent terminology throughout the codebase. Do not invent new terms or synonyms for existing concepts. Prefer standard words like `get`, `create`, `update`, `upsert`, and `delete` in endpoints and functions. Prefer nouns like `Entity`, `User`, `Form`, `Response`, `Request`, etc..
+6. **Don't Repeat Yourself (DRY):** Before writing new scripts, functions, or templates, evaluate if the logic can be extrapolated into generic foundational files (like `common` or base interfaces). Never duplicate logic unnecessarily.
 
 ## Language preferences
 1. **Language Preference:** Prefer statically compiled languages over interpreted languages.
