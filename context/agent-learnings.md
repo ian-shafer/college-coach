@@ -1,6 +1,9 @@
 # Agent Operational Learnings
 
-*This file is an autonomous memory buffer actively maintained by the Agent to permanently log hard-learned architectural quirks, project-specific syntax hacks, and rigorous rules established during implementation. It does not require an `LGTM` to update or commit.*
+*This file is an autonomous memory buffer maintained by the Agent to log hard-learned architectural quirks, project-specific syntax hacks, and rules established during implementation. It does not require an `LGTM` to update or commit.*
+
+## Communication Constraints
+1. **Adverb Restriction**: Avoid using superfluous "-ly" adverbs (e.g., aggressively, natively, strictly, rigorously). Keep technical communication clean, direct, and readable.
 
 ## SQLite & Exposed Extrapolations
 1. **Never String-Match SQLExceptions**: When tracking SQLite violations via Exposed, never parse `e.message` dynamically. Map `e.cause as? java.sql.SQLException` natively. The SQLite integer codes for strict constraints are `errorCode == 19` (Constraint) and `errorCode == 2067` (Unique Constraint).

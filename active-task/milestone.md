@@ -1,20 +1,26 @@
-# Milestone: Profile Editing Endpoint
+**Milestone Template:**
+# Milestone: Executable Scripts Standardization Lifecycle
+This milestone reorganizes the `bin/` scripts to follow standard Unix daemon semantics (`start`, `stop`, `restart`, `check`). This replaces foreground console executions with background processes tracked by PID files in the `var/pid/` directory.
 
-Implement a REST endpoint allowing authenticated users to modify their profile information (email, password, first name, last name, and display name). This implements the new Hexagonal Architecture and Functional Programming laws to isolate database state.
+## Success Criteria
+- Wrapper scripts manage process tracking, saving the active `$!` Process ID to `var/pid/[executable].pid`.
+- The `start` script blocks execution by pinging the host port `:8080` until the service is listening.
+- The `stop` script identifies the tracked PID, sends a termination signal, and loops to verify termination.
+- The `restart` script delegates to sequential `stop` and `start` operations.
+- The `check` script evaluates the saved PID using `kill -0` to ascertain status safely.
+- An SDD Context Anchor at `bin/SPEC.md` documents this tracking environment.
 
-# Part 1: API Contract (TypeSpec)
-Update `main.tsp` to define:
-- `UpdateProfileRequest` mapping optional parameters for email, password, and names.
-- An authenticated `@patch /users/me` endpoint.
+## Edge Cases
+- **Stale Tracking PIDs:** If the target server crashes, the `.pid` file will persist. Scripts MUST verify the PID corresponds to an active process before making assumptions.
+- **Infinite Blocking Timeouts:** The `start` and `stop` wait-loops MUST implement hard timeouts (e.g., 30s) rather than hanging the terminal.
+- **Orphaned Docker Bindings:** `start-rest-server` operates Ktor via `docker compose`. Extracting its PID on the host requires resolving the specific binary inside the container or running a bash tracking wrapper that orchestrates Docker signals.
 
-# Part 2: Domain Layer (Ports)
-Create a `UserRepository` interface for data interactions (e.g., `updateProfile`). Following the "Return values instead of exceptions" rule, operations will return functional Kotlin `Result` types capturing constraints without throwing exceptions.
+## Dependencies
+- None.
 
-# Part 3: Data Layer (Adapters)
-Implement `SqlUserRepository` conforming to `UserRepository`. This adapter executes Exposed `Users.update` logic, encapsulating the database from the HTTP router.
+# Part 1: Structural File Setup & Anchor Documentation
+- Implement the SDD directory baseline at `bin/SPEC.md`.
+- Provision the `var/pid/` directory before bash start invocations.
 
-# Part 4: Domain Layer (Validators)
-Create a generic `Validator<T>` interface port returning a structured `ValidationResult`. Implement a pure, stateless `ProfileValidator : Validator<UpdateProfileRequest>` responsible exclusively for input constraints (e.g., enforcing name length >= 1). This enforces both the Single Responsibility and Interface-First laws by decoupling validation logic predictably.
-
-# Part 5: API Layer (Ktor Endpoints)
-Define `UserRoutes.kt`. Inject `UserRepository` and `ProfileValidator` into the router via constructor injection. The route will strictly route traffic, passing inputs to the validator and repository, and mapping output models sequentially into `200 OK`, `400 BadRequest`, or `409 Conflict` JSON responses.
+# Part 2: Executable Target Lifecycles
+Update and deploy Unix scripts for all core binaries (`start-rest-server`, etc.).
