@@ -1,6 +1,14 @@
 #!/bin/bash
 source "$(dirname "$0")/common"
 
+help() {
+    if [ -n "$1" ]; then
+        echo "Error: $1"
+    fi
+    echo "Usage: bin/wait-for [--period duration] <timeout> <command...>"
+    exit 1
+}
+
 PERIOD="1s"
 
 while [[ "$#" -gt 0 ]]; do
@@ -11,14 +19,12 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 if [ "$#" -lt 2 ]; then
-    echo "Usage: bin/wait-for [--period duration] <timeout> <command...>"
-    exit 1
+    help
 fi
 
 TIMEOUT_STR="$1"
 if [[ ! "$TIMEOUT_STR" =~ ^[0-9]+[smhd]?$ ]]; then
-    echo "Error: Invalid timeout format [$TIMEOUT_STR]. Expected a number optionally followed by s, m, h, or d (e.g., 30, 30s, 2m)."
-    exit 1
+    help "Invalid timeout format [$TIMEOUT_STR]. Expected a number optionally followed by s, m, h, or d (e.g., 30, 30s, 2m)."
 fi
 shift
 COMMAND=("$@")
