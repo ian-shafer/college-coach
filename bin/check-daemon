@@ -1,0 +1,12 @@
+#!/bin/bash
+source "$(dirname "$0")/common"
+
+SERVICE_NAME="$1"
+
+if [ -z "$SERVICE_NAME" ]; then
+    echo "Usage: bin/check-daemon <SERVICE_NAME>"
+    exit 1
+fi
+
+bin/check-pid "$SERVICE_NAME" && bin/check-port "$SERVICE_NAME"
+exit $?

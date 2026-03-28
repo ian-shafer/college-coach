@@ -1,0 +1,40 @@
+#!/bin/bash
+source "$(dirname "$0")/common"
+
+SERVICE_NAME="$1"
+PORT="$2"
+
+if [ -z "$SERVICE_NAME" ] || [ -z "$PORT" ]; then
+    echo "Usage: bin/start-daemon <SERVICE_NAME> <PORT>"
+    exit 1
+fi
+
+mkdir -p var/run var/log
+
+PID_FILE="var/run/$SERVICE_NAME.pid"
+PORT_FILE="var/run/$SERVICE_NAME.port"
+
+if [ -f "$PID_FILE" ]; then
+    if bin/check-pid "$SERVICE_NAME" >/dev/null 2>&1; then
+        echo "Error: $SERVICE_NAME is already running."
+        exit 1
+    fi
+fi
+
+echo "$PORT" > "$PORT_FILE"
+
+echo "Starting $SERVICE_NAME on port $PORT..."
+
+SERVER_PORT="$PORT" docker compose up "$SERVICE_NAME" > "var/log/$SERVICE_NAME.log" 2>&1 &
+PID=$!
+
+echo "$PID" > "$PID_FILE"
+
+if bin/wait-for 30 bin/check-port "$SERVICE_NAME" >/dev/null 2>&1; then
+    echo "Successfully started $SERVICE_NAME (PID: $PID)"
+    exit 0
+else
+    echo "Error: $SERVICE_NAME failed to start within 30 seconds."
+    kill $PID 2>/dev/null
+    exit 1
+fi
