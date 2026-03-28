@@ -1,26 +1,27 @@
-# Milestone: Executable Scripts Standardization & Lifecycle
-This milestone reorganizes the `bin/` scripts to follow standard Unix daemon semantics (`start`, `stop`, `restart`, `check`). This replaces foreground console executions with background processes tracked by PID files in the `var/run/` directory.
+# Milestone: iOS Authentication User Flows
 
-## Success Criteria
-- Wrapper scripts manage process tracking, saving the active `$!` Process ID to `var/run/[executable].pid`.
-- The `start` script blocks execution until the service is ready to serve requests. This could be done by pinging the host port (e.g. `localhost:8080`) until the service responds.
-- The `stop` script identifies the tracked PID, sends a termination signal, and loops until the process is terminated (it should use the `check` script for this).
-- The `restart` script delegates to sequential `stop` and `start` operations.
-- The `check` script is split cleanly into distinct `check-pid` (verifies the saved PID using `kill -0`) and `check-port` (verifies network readiness using `nc -z`). The parent `check` script safely delegates validation to both primitives simultaneously. The target port MUST fundamentally be saved locally to `var/run/[executable].port` and securely wired through all the way down to the underlying Kotlin Ktor backend.
-- An SDD Context Anchor at `bin/SPEC.md` documents this tracking environment.
-- **Generic Daemon Engine**: Core logic must exist in foundational scripts (`start-daemon`, `stop-daemon`, `check-daemon`). Executable-specific files (e.g., `start-rest-server`) will act as thin wrappers that simply invoke these shared foundational scripts (e.g., `start-daemon rest-server`).
+## 🎯 Objective
+Establish a robust native iOS authentication framework supporting end-to-end user lifecycle management. 
+An unauthenticated user must be able to register a new account or log into an existing one. 
+Once authenticated, a user must be able to view/edit their profile or terminate their session via logout.
 
-## Edge Cases
-- **Stale Tracking PIDs:** If the target server crashes or is terminated externally, the `.pid` file will persist. Scripts MUST verify the PID corresponds to an active process before making assumptions.
-- **Infinite Blocking Timeouts:** The `start` and `stop` wait-loops MUST implement hard timeouts (e.g., 30s) rather than hanging the terminal.
-- **Orphaned Docker Bindings:** `start-rest-server` operates Ktor via `docker compose`. Extracting its PID on the host requires resolving the specific binary inside the container or running a bash tracking wrapper that orchestrates Docker signals.
+## 📋 Requirements
 
-## Dependencies
-- None.
+### 1. Unauthenticated Flows
+- **Login**: Build a `LoginView` capturing user credentials, triggering a handshake with the Ktor backend, and routing the JWT token into `KeychainManager`.
+- **Registration**: Finalize the `RegistrationView` pipeline mapping form validation state and providing seamless routing into the authenticated application root view.
 
-# Part 1: Structural File Setup & Anchor Documentation
-- Implement the SDD directory baseline at `bin/SPEC.md`.
-- Provision the `var/run/` directory before bash start invocations.
+### 2. Authenticated Flows
+- **Profile Management**: Build a `ProfileView` enabling the user to edit their profile details and persist mutations against the backend.
+- **Logout**: Implement an architectural logout hook that purges active keychain tokens and redirects the application root view back to unauthenticated space.
 
-# Part 2: Executable Target Lifecycles
-Update and deploy Unix scripts for all core binaries (`start-rest-server`, etc.).
+### 3. Required Engineering Standard
+- **Handle All Cases**: All Swift `switch` evaluations, `Result` mappings, and network response decoding blocks must execute exhaustive constraints. Code must never utilize default swallowing (`default:`) for UI state transitions or backend logic paths.
+
+## 📈 Acceptance Criteria
+1. Device launches dynamically resolving root views based on persistent `KeychainManager` token status.
+2. Unauthenticated users can choose to Login or Register.
+3. Successful Login/Registration routes the local device to the core App view.
+4. Authenticated users can modify their profile payload.
+5. Users can log out, which destroys the JWT and repaints the initial navigation gate.
+6. All conditional edges (network failures, invalid tokens, formatting boundaries) actively surface mapped error states instead of crashing or hanging silently.

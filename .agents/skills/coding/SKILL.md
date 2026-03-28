@@ -13,3 +13,7 @@ This skill establishes the universal logic constraints that apply across all pro
    - You must define exactly what inputs, arguments, or data structures are permitted by a function or script.
    - Any input that does not match the defined boundary must be instantly rejected.
    - *Implementation Formulation*: Never check if an input is "missing" (e.g., `if count < 1`). Instead, check if the input is "exactly what is expected" (e.g., `if count != 1`), rejecting any unexpected surplus data.
+
+2. **Handle All Cases** (Exhaustive Evaluation)
+   - The execution flow must be robust and explicitly address every possible input state, network error, or logic branch.
+   - Never implement partial conditional evaluations or assume "default" closures cover unhandled edge cases.
