@@ -67,6 +67,28 @@ Statelessness: The application layer must be entirely stateless to allow for hor
 4. **Local Directory Specifications (SDD Context Anchors)**
 Every significant architectural directory (e.g., `domain/`, `adapters/`, specific feature modules) MUST contain a `SPEC.md` file. This file acts as a localized Spec-Driven Development anchor natively, explicitly detailing the exact purpose, strict business rules, and structural boundaries of the code natively within that specific directory. Any AI agent operating in this repository MUST fiercely prioritize reading this local `SPEC.md` file first to rapidly acquire localized context before scaffolding or modifying any logic within that directory.
 
+   **Standard SPEC.md Template:**
+   ```markdown
+   # Module Specification: [Directory Name]
+   
+   ## 🎯 Primary Purpose
+   A concise 1-2 sentence description of exactly what the code in this directory is functionally responsible for.
+   
+   ## 🏗 Architectural Boundaries
+   - **Allowed Inbound Callers:** What modules are allowed to import and securely call code from this directory?
+   - **Allowed Outbound Dependencies:** What external libraries or internal folders is this directory explicitly permitted to import?
+   
+   ## 🧩 Core Components
+   - **[Component/Interface Name]:** Brief behavioral description of the primary classes or interfaces housed here.
+   
+   ## 🔄 State & Data Flow
+   - **Data Mutability:** Are the components here expected to maintain state, or must they be rigorously functional and stateless? 
+   - **Error Handling:** Should this module gracefully throw runtime exceptions, or strictly return sealed functional `Result` payloads?
+   
+   ## ⚠️ Strict Constraints & Known Gotchas
+   - Critical security boundaries, structural quirks, or rigid rules that ANY developer or AI Agent absolutely MUST know before touching a single file in this folder.
+   ```
+
 ## Planning & Implementation
 1. **Active Task Lifecycle:** The current task is always specified in the `/active-task` directory. **Phase Transition Protocol:** To formally transition between ANY two phases in the lifecycle, the agent MUST explicitly state two things: (1) what phase we are currently in, and (2) what the next phase is. Furthermore, the agent MUST present a highly structured SDD Summary containing: 🎯 **Key Decisions & Rationale**, 🔍 **Critical Items to Review**, and 📊 **Milestone Progress** (e.g., "Phase 3 of 7 Complete"). The agent MUST then completely halt execution and wait for the architect's explicit approval containing the exact string `LGTM` (e.g., `LGTM. On to the next phase!`). The agent absolutely cannot proceed to prioritize the next phase without this explicit `LGTM` authorization.
    * **Phase 1: Author the Milestone Definition (`active-task/milestone.md`)**:
