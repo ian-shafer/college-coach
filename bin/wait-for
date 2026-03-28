@@ -1,11 +1,12 @@
 #!/bin/bash
+set -e
 source "$(dirname "$0")/common"
 
 help() {
     if [ -n "$1" ]; then
-        echo "Error: $1"
+        echo "$1"
     fi
-    echo "Usage: bin/wait-for [--period duration] <timeout> <command...>"
+    echo "Usage: bin/wait-for [-h|--help] [-p|--period duration] <timeout> <command...>"
     exit 1
 }
 
@@ -13,7 +14,8 @@ PERIOD="1s"
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
-        --period|-p) PERIOD="$2"; shift 2 ;;
+        -h|--help) help ;;
+        -p|--period) PERIOD="$2"; shift 2 ;;
         *) break ;;
     esac
 done
@@ -42,8 +44,11 @@ SECONDS=0
 LAST_STATUS=1
 
 while [ $SECONDS -lt $TIMEOUT_SECONDS ]; do
-    "${COMMAND[@]}"
-    LAST_STATUS=$?
+    if "${COMMAND[@]}"; then
+        LAST_STATUS=0
+    else
+        LAST_STATUS=$?
+    fi
 
     if [ $LAST_STATUS -eq 0 ]; then
         exit 0

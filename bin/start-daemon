@@ -1,12 +1,28 @@
 #!/bin/bash
+set -e
 source "$(dirname "$0")/common"
+
+help() {
+    if [ -n "$1" ]; then
+        echo "$1"
+    fi
+    echo "Usage: bin/start-daemon [-h|--help] <SERVICE_NAME> <PORT>"
+    exit 1
+}
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        -h|--help) help ;;
+        -*) help "Unknown option $1" ;;
+        *) break ;;
+    esac
+done
 
 SERVICE_NAME="$1"
 PORT="$2"
 
 if [ -z "$SERVICE_NAME" ] || [ -z "$PORT" ]; then
-    echo "Usage: bin/start-daemon <SERVICE_NAME> <PORT>"
-    exit 1
+    help
 fi
 
 mkdir -p var/run var/log
@@ -35,6 +51,6 @@ if bin/wait-for 30 bin/check-port "$SERVICE_NAME" >/dev/null 2>&1; then
     exit 0
 else
     echo "Error: $SERVICE_NAME failed to start within 30 seconds."
-    kill $PID 2>/dev/null
+    kill $PID 2>/dev/null || true
     exit 1
 fi
