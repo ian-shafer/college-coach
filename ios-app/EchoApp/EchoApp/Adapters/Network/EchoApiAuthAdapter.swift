@@ -1,7 +1,7 @@
 import Foundation
 import EchoAPI
 
-public class EchoApiAuthAdapter: AuthRepositoryPort {
+public class EchoApiAuthAdapter: AuthRepository {
     public init() {}
     
     public func login(credentials: LoginCredentials) async throws -> String {

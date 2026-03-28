@@ -26,7 +26,7 @@ public struct RegisterProfile {
     }
 }
 
-public protocol AuthRepositoryPort {
+public protocol AuthRepository {
     func login(credentials: LoginCredentials) async throws -> String
     func register(profile: RegisterProfile) async throws -> String
 }

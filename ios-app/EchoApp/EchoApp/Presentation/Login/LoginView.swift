@@ -3,9 +3,9 @@ import SwiftUI
 struct LoginView: View {
     @EnvironmentObject var sessionState: SessionState
     @StateObject private var viewModel: LoginViewModel
-    let authAdapter: AuthRepositoryPort
+    let authAdapter: AuthRepository
     
-    init(authAdapter: AuthRepositoryPort) {
+    init(authAdapter: AuthRepository) {
         self.authAdapter = authAdapter
         _viewModel = StateObject(wrappedValue: LoginViewModel(authRepository: authAdapter))
     }

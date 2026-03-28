@@ -5,9 +5,9 @@ import Combine
 public class SessionState: ObservableObject {
     @Published public var isAuthenticated: Bool = false
     
-    private let sessionManager: SessionManagerPort
+    private let sessionManager: SessionManager
     
-    public init(sessionManager: SessionManagerPort) {
+    public init(sessionManager: SessionManager) {
         self.sessionManager = sessionManager
         self.isAuthenticated = sessionManager.getToken() != nil
     }

@@ -1,6 +1,6 @@
 import Foundation
 
-public protocol SessionManagerPort {
+public protocol SessionManager {
     func saveToken(_ token: String)
     func getToken() -> String?
     func deleteToken()

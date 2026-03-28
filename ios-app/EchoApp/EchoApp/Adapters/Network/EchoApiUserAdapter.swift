@@ -1,7 +1,7 @@
 import Foundation
 import EchoAPI
 
-public class EchoApiUserAdapter: UserRepositoryPort {
+public class EchoApiUserAdapter: UserRepository {
     public init() {}
     
     public func updateProfile(payload: ProfileUpdatePayload) async throws -> DomainUser {

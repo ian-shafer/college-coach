@@ -10,9 +10,9 @@ public class LoginViewModel: ObservableObject {
     @Published public var globalMessages: [String] = []
     @Published public var isLoading = false
     
-    private let authRepository: AuthRepositoryPort
+    private let authRepository: AuthRepository
     
-    public init(authRepository: AuthRepositoryPort) {
+    public init(authRepository: AuthRepository) {
         self.authRepository = authRepository
     }
     

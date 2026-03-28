@@ -15,9 +15,9 @@ public class RegistrationViewModel: ObservableObject {
     @Published public var isLoading = false
     @Published public var isRegistered = false
     
-    private let authRepository: AuthRepositoryPort
+    private let authRepository: AuthRepository
     
-    public init(authRepository: AuthRepositoryPort) {
+    public init(authRepository: AuthRepository) {
         self.authRepository = authRepository
     }
     

@@ -1,7 +1,7 @@
 import Foundation
 import Security
 
-public class KeychainSessionAdapter: SessionManagerPort {
+public class KeychainSessionAdapter: SessionManager {
     public static let shared = KeychainSessionAdapter()
     private let tokenKey = "com.echoapp.jwt.token"
     

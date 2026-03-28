@@ -24,6 +24,6 @@ public struct DomainUser {
     public let displayName: String?
 }
 
-public protocol UserRepositoryPort {
+public protocol UserRepository {
     func updateProfile(payload: ProfileUpdatePayload) async throws -> DomainUser
 }

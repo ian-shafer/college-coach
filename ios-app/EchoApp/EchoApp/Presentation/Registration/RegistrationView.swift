@@ -4,7 +4,7 @@ struct RegistrationView: View {
     @EnvironmentObject var sessionState: SessionState
     @StateObject private var viewModel: RegistrationViewModel
     
-    init(authAdapter: AuthRepositoryPort) {
+    init(authAdapter: AuthRepository) {
         _viewModel = StateObject(wrappedValue: RegistrationViewModel(authRepository: authAdapter))
     }
     

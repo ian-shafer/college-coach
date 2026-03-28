@@ -13,9 +13,9 @@ public class ProfileViewModel: ObservableObject {
     @Published public var isLoading = false
     @Published public var isUpdated = false
     
-    private let userRepository: UserRepositoryPort
+    private let userRepository: UserRepository
     
-    public init(userRepository: UserRepositoryPort) {
+    public init(userRepository: UserRepository) {
         self.userRepository = userRepository
     }
     

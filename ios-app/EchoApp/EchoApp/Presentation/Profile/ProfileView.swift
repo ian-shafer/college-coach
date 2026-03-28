@@ -4,7 +4,7 @@ struct ProfileView: View {
     @EnvironmentObject var sessionState: SessionState
     @StateObject private var viewModel: ProfileViewModel
     
-    init(userAdapter: UserRepositoryPort) {
+    init(userAdapter: UserRepository) {
         _viewModel = StateObject(wrappedValue: ProfileViewModel(userRepository: userAdapter))
     }
     
