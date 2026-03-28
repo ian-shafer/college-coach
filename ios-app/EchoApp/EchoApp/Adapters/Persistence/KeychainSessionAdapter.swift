@@ -24,7 +24,7 @@ public class KeychainSessionAdapter: SessionManager {
         return Session(token: nil)
     }
     
-    public func setToken(token: String) -> Session {
+    public func setToken(_ session: Session, token: String) -> Session {
         guard let data = token.data(using: .utf8) else {
             return Session(token: nil)
         }
@@ -41,7 +41,7 @@ public class KeychainSessionAdapter: SessionManager {
         return Session(token: token)
     }
     
-    public func logout() -> Session {
+    public func logout(_ session: Session) -> Session {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrAccount as String: tokenKey

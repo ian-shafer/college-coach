@@ -13,10 +13,10 @@ public class SessionState: ObservableObject {
     }
     
     public func login(token: String) {
-        self.session = sessionManager.setToken(token: token)
+        self.session = sessionManager.setToken(self.session, token: token)
     }
     
     public func logout() {
-        self.session = sessionManager.logout()
+        self.session = sessionManager.logout(self.session)
     }
 }

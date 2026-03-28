@@ -14,6 +14,6 @@ public struct Session {
 
 public protocol SessionManager {
     func createSession() -> Session
-    func setToken(token: String) -> Session
-    func logout() -> Session
+    func setToken(_ session: Session, token: String) -> Session
+    func logout(_ session: Session) -> Session
 }
