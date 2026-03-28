@@ -19,7 +19,7 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 if [ "$#" -gt 0 ]; then
-    help "Unexpected argument provided: [$1]"
+    help "Unexpected argument(s) provided: [$*]"
 fi
 
 bin/stop-daemon "rest-server"
