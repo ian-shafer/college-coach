@@ -1,5 +1,5 @@
 #!/bin/bash
-source "$(dirname "$0")/common"
+source "$(dirname "$0")/../bin/common"
 
 echo "Removing the build directory..."
 rm -rf build || { echo "Error: Could not remove [build]"; exit 1; }

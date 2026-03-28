@@ -1,5 +1,5 @@
 #!/bin/bash
-source "$(dirname "$0")/common"
+source "$(dirname "$0")/../bin/common"
 
 echo "Compiling TypeSpec to OpenAPI..."
 docker compose up typespec-compiler || { echo "Error: Failed to compile TypeSpec to OpenAPI."; exit 1; }
