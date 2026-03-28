@@ -22,4 +22,15 @@ internal extension Error {
         }
         return .network(self)
     }
+
+    func mapToDomain<T>(
+        unauthorizedMessage: String,
+        operationFailed: (String) -> T,
+        networkError: (Error) -> T
+    ) -> T {
+        switch self.parseEchoApiError(unauthorizedMessage: unauthorizedMessage) {
+        case .message(let msg): return operationFailed(msg)
+        case .network(let err): return networkError(err)
+        }
+    }
 }

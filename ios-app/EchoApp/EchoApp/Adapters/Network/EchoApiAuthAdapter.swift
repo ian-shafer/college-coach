@@ -1,14 +1,7 @@
 import Foundation
 import EchoAPI
 
-private extension Error {
-    func toAuthError() -> AuthError {
-        switch self.parseEchoApiError(unauthorizedMessage: "HTTP [401]: Unauthorized credentials.") {
-        case .message(let msg): return .operationFailed(msg)
-        case .network(let err): return .networkError(err)
-        }
-    }
-}
+
 
 public class EchoApiAuthAdapter: AuthRepository {
     private let incompleteAuthError = "Incomplete credentials"
@@ -26,7 +19,12 @@ public class EchoApiAuthAdapter: AuthRepository {
         return await withCheckedContinuation { continuation in
             DefaultAPI.login(authRequest: request) { data, error in
                 if let error = error {
-                    continuation.resume(returning: .failure(error.toAuthError()))
+                    let mappedError = error.mapToDomain(
+                        unauthorizedMessage: "HTTP [401]: Unauthorized credentials.",
+                        operationFailed: AuthError.operationFailed,
+                        networkError: AuthError.networkError
+                    )
+                    continuation.resume(returning: .failure(mappedError))
                     return
                 }
                 if let token = data?.token {
@@ -53,7 +51,12 @@ public class EchoApiAuthAdapter: AuthRepository {
         return await withCheckedContinuation { continuation in
             DefaultAPI.register(authRequest: request) { data, error in
                 if let error = error {
-                    continuation.resume(returning: .failure(error.toAuthError()))
+                    let mappedError = error.mapToDomain(
+                        unauthorizedMessage: "HTTP [401]: Unauthorized credentials.",
+                        operationFailed: AuthError.operationFailed,
+                        networkError: AuthError.networkError
+                    )
+                    continuation.resume(returning: .failure(mappedError))
                     return
                 }
                 if let token = data?.token {

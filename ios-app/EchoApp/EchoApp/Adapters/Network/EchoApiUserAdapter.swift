@@ -13,14 +13,7 @@ private extension User {
     }
 }
 
-private extension Error {
-    func toUserError() -> UserError {
-        switch self.parseEchoApiError(unauthorizedMessage: "HTTP [401]: Unauthorized access. Please log in again.") {
-        case .message(let msg): return .operationFailed(msg)
-        case .network(let err): return .networkError(err)
-        }
-    }
-}
+
 
 public class EchoApiUserAdapter: UserRepository {
     private let invalidFormatError = "Invalid API response format"
@@ -39,7 +32,12 @@ public class EchoApiUserAdapter: UserRepository {
         return await withCheckedContinuation { continuation in
             DefaultAPI.updateProfile(updateProfileRequest: request) { data, error in
                 if let error = error {
-                    continuation.resume(returning: .failure(error.toUserError()))
+                    let mappedError = error.mapToDomain(
+                        unauthorizedMessage: "HTTP [401]: Unauthorized access. Please log in again.",
+                        operationFailed: UserError.operationFailed,
+                        networkError: UserError.networkError
+                    )
+                    continuation.resume(returning: .failure(mappedError))
                     return
                 }
                 if let user = data {
@@ -55,7 +53,12 @@ public class EchoApiUserAdapter: UserRepository {
         return await withCheckedContinuation { continuation in
             DefaultAPI.getProfile { data, error in
                 if let error = error {
-                    continuation.resume(returning: .failure(error.toUserError()))
+                    let mappedError = error.mapToDomain(
+                        unauthorizedMessage: "HTTP [401]: Unauthorized access. Please log in again.",
+                        operationFailed: UserError.operationFailed,
+                        networkError: UserError.networkError
+                    )
+                    continuation.resume(returning: .failure(mappedError))
                     return
                 }
                 if let user = data {
