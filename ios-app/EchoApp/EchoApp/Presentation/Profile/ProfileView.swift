@@ -20,15 +20,27 @@ struct ProfileView: View {
                 }
                 
                 Section(header: Text("Update Profile")) {
-                    TextField("Email", text: $viewModel.email)
+                    TextField("Email", text: Binding(
+                        get: { viewModel.email ?? "" },
+                        set: { viewModel.email = $0.isEmpty ? nil : $0 }
+                    ))
                         .keyboardType(.emailAddress)
                         .autocapitalization(.none)
                     
                     SecureField("New Password (Optional)", text: $viewModel.password)
                     
-                    TextField("First Name", text: $viewModel.firstName)
-                    TextField("Last Name", text: $viewModel.lastName)
-                    TextField("Display Name", text: $viewModel.displayName)
+                    TextField("First Name", text: Binding(
+                        get: { viewModel.firstName ?? "" },
+                        set: { viewModel.firstName = $0.isEmpty ? nil : $0 }
+                    ))
+                    TextField("Last Name", text: Binding(
+                        get: { viewModel.lastName ?? "" },
+                        set: { viewModel.lastName = $0.isEmpty ? nil : $0 }
+                    ))
+                    TextField("Display Name", text: Binding(
+                        get: { viewModel.displayName ?? "" },
+                        set: { viewModel.displayName = $0.isEmpty ? nil : $0 }
+                    ))
                 }
                 
                 Section {
@@ -56,6 +68,9 @@ struct ProfileView: View {
                     message: Text("Your profile has been updated."),
                     dismissButton: .default(Text("OK"))
                 )
+            }
+            .task {
+                viewModel.loadProfile()
             }
         }
     }

@@ -66,4 +66,5 @@ public enum UserError: Error {
 
 public protocol UserRepository {
     func updateProfile(_ update: ProfileUpdate) async -> Result<DomainUser, UserError>
+    func getProfile() async -> Result<DomainUser, UserError>
 }

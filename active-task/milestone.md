@@ -1,19 +1,21 @@
-# Milestone: Backend Profile Fetch Endpoint
-To provide clients with access to the user's existing profile properties, we must expose a secure REST endpoint referencing the active session's parameters. This necessitates extending the TypeSpec definition, compiling the new schema definitions, and implementing the Kotlin auth route querying the database.
+# Milestone: iOS Profile Initialization
+When users open the settings view, they must see their current account properties. Building on the freshly deployed backend `getProfile` endpoint, we will wire the `UserRepository` to retrieve and render the active state into the SwiftUI forms.
 
 ## Success Criteria
-- `TypeSpec` outputs a new explicit `@get` `getProfile` signature under `/users/me`.
-- Kotlin Ktor endpoints secure the route validating the UUID mapping matching the active requester.
-- The endpoint returns a valid `User` model payload passing standard authentication checks.
+- `UserRepository` exposes an isolated port `getProfile()`.
+- `EchoApiUserAdapter` maps the backend schema into a concrete `DomainUser` struct preserving exhaustive `Result` hierarchies.
+- `ProfileViewModel` exports a `loadProfile()` closure populating the state bounds.
+- `ProfileView` triggers execution `onAppear`, hydrating the user interface inputs overriding empty states.
 
 ## Edge Cases
-- Invalid or expired tokens requesting `/users/me` throwing `UnauthorizedResponse`.
+- Backend 404 or formatting boundaries resolving through exhaustive UI switch loops triggering visual notifications.
+- Loading boundaries preventing multiple concurrent fetches blocking variable overlap.
 
 ## Dependencies
-- Active JWT Authentication infrastructure validating mapped headers.
+- Backend `/users/me` endpoint.
 
-# Part 1: TypeSpec & API Generation
-Add the `@get` endpoint structural rule mapping a `User` model output. Trigger local code generation.
+# Part 1: Domain & Adapter Mappings
+Expand the Hexagonal ports enforcing `getProfile()` signatures routing the generated SDK responses into pure value objects.
 
-# Part 2: Backend Implementation
-Add `.get("/me")` routing under the Auth block translating the JWT principal into a structured `User` payload referencing the Exposed `Users` table.
+# Part 2: Presentation Resolvers
+Assign the result payloads into the `@Published` properties blocking UI views triggered across the `task` or `onAppear` environments mutating state layouts.

@@ -1,26 +1,28 @@
-# Implementation Plan: Backend Profile Fetch Endpoint
+# Implementation Plan: iOS Profile Initialization
 
-This plan executes the requirements defined in the `active-task/milestone.md` to expose a GET `/users/me` endpoint.
+This plan resolves the requirements outlined in `active-task/milestone.md` pulling the new compiled `getProfile` capability into the `ProfileView`.
 
 ## 📋 Proposed Changes
 
-### Step 1: Extending TypeSpec Definition
-* **Requirement Tracked:** `TypeSpec` outputs a new explicit `@get` `getProfile` signature under `/users/me`.
+### Step 1: Extend Hexagonal Domain
 * **Action:**
-  - Modify `specs/api/main.tsp` to add `@route("/users/me") @get op getProfile(): User | UnauthorizedResponse;`.
-  - Execute the TypeSpec compiler (e.g., `npx tsp compile .`) within `specs/api` to regenerate the server interface schemas.
+  - Modify `ios-app/EchoApp/EchoApp/Domain/Ports/UserRepository.swift`.
+  - Add `func getProfile() async -> Result<DomainUser, UserError>` to the protocol structure.
 
-### Step 2: Extrapolate Shared Logic (DRY)
-* **Requirement Tracked:** Architectural integrity constraint (Never duplicate logic unnecessarily).
+### Step 2: Implement API Adapter
 * **Action:**
-  - In `UserRoutes.kt`, extract the `ApiUser` mapping logic (currently nested inside `updateProfile`) into a functional extension `fun com.echoapp.domain.User.toApiModel(): com.echoapp.models.User`.
-  - Refactor the existing `patch("/users/me")` return chain to utilize this new extension function instead of defining inline variable assignments twice.
+  - Modify `ios-app/EchoApp/EchoApp/Adapters/Network/EchoApiUserAdapter.swift`.
+  - Implement `getProfile() async -> Result<DomainUser, UserError>` wrapping `DefaultAPI.getProfile()` in an `await withCheckedContinuation` block.
+  - Apply the exhaustive `Handle All Cases` logic bridging `data` and `error` outputs into `UserError` enumeration variations mirroring the `updateProfile` adapter logic.
 
-### Step 3: Implement Ktor Routing
-* **Requirement Tracked:** Kotlin Ktor endpoints secure the route validating the UUID mapping matching the active requester returning a valid `User`.
+### Step 3: Hydrate Presentation Layer (ViewModel)
 * **Action:**
-  - Open `rest-server/src/main/kotlin/com/echoapp/server/routes/UserRoutes.kt`.
-  - Inside the existing `authenticate("auth-jwt")` block, append `get("/users/me")`.
-  - Extract the UUID from the `JWTPrincipal` payload claims. Return `HttpStatusCode.Unauthorized` if the principal is missing.
-  - **Exhaustive Evaluation:** Invoke `userRepository.findById(userId)`. If null is returned, output `HttpStatusCode.NotFound` and a static formatted constraint error message (e.g., `User not found` without dynamic brackets).
-  - If found, map the user via `.toApiModel()` and execute `call.respond()` returning `HttpStatusCode.OK` and the mapped payload structure.
+  - Modify `ios-app/EchoApp/EchoApp/Presentation/Profile/ProfileViewModel.swift`.
+  - Introduce an asynchronous `@MainActor public func loadProfile()`.
+  - On `success`, assign the returned `user` properties mapping into the `@Published` inputs (e.g., `self.email = user.email ?? ""`).
+  - On `failure`, map the `error.localizedDescription` into `globalMessages`.
+
+### Step 4: Bind the User Interface (View)
+* **Action:**
+  - Modify `ios-app/EchoApp/EchoApp/Presentation/Profile/ProfileView.swift`.
+  - Append `.task { viewModel.loadProfile() }` triggering asynchronous evaluation flows when the component loads.

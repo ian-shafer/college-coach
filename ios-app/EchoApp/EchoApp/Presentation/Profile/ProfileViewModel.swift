@@ -3,11 +3,11 @@ import Combine
 
 @MainActor
 public class ProfileViewModel: ObservableObject {
-    @Published public var email = ""
+    @Published public var email: String? = nil
     @Published public var password = ""
-    @Published public var firstName = ""
-    @Published public var lastName = ""
-    @Published public var displayName = ""
+    @Published public var firstName: String? = nil
+    @Published public var lastName: String? = nil
+    @Published public var displayName: String? = nil
     
     @Published public var globalMessages: [String] = []
     @Published public var isLoading = false
@@ -21,16 +21,33 @@ public class ProfileViewModel: ObservableObject {
         self.sessionManager = sessionManager
     }
     
+    public func loadProfile() {
+        isLoading = true
+        globalMessages.removeAll()
+        
+        Task {
+            let result = await userRepository.getProfile()
+            self.isLoading = false
+            
+            switch result {
+            case .success(let user):
+                self.applyUser(user)
+            case .failure(let error):
+                self.handleError(error)
+            }
+        }
+    }
+    
     public func updateProfile() {
         isLoading = true
         globalMessages.removeAll()
         
         let update = ProfileUpdate()
-            .setEmail(email.isEmpty ? nil : email)
+            .setEmail(email)
             .setPassword(password.isEmpty ? nil : password)
-            .setFirstName(firstName.isEmpty ? nil : firstName)
-            .setLastName(lastName.isEmpty ? nil : lastName)
-            .setDisplayName(displayName.isEmpty ? nil : displayName)
+            .setFirstName(firstName)
+            .setLastName(lastName)
+            .setDisplayName(displayName)
             .build()
         
         Task {
@@ -39,16 +56,20 @@ public class ProfileViewModel: ObservableObject {
             
             switch result {
             case .success(let user):
-                self.email = user.email ?? ""
-                self.firstName = user.firstName ?? ""
-                self.lastName = user.lastName ?? ""
-                self.displayName = user.displayName ?? ""
+                self.applyUser(user)
                 self.password = ""
                 self.isUpdated = true
             case .failure(let error):
                 self.handleError(error)
             }
         }
+    }
+    
+    private func applyUser(_ user: DomainUser) {
+        self.email = user.email
+        self.firstName = user.firstName
+        self.lastName = user.lastName
+        self.displayName = user.displayName
     }
     
     private func handleError(_ error: Error) {

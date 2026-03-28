@@ -1,6 +1,18 @@
 import Foundation
 import EchoAPI
 
+private extension User {
+    func toDomainModel() -> DomainUser {
+        return DomainUser()
+            .setId(self.id)
+            .setEmail(self.email)
+            .setFirstName(self.firstName)
+            .setLastName(self.lastName)
+            .setDisplayName(self.displayName)
+            .build()
+    }
+}
+
 public class EchoApiUserAdapter: UserRepository {
     private let invalidFormatError = "Invalid API response format"
 
@@ -22,14 +34,23 @@ public class EchoApiUserAdapter: UserRepository {
                     return
                 }
                 if let user = data {
-                    let domainUser = DomainUser()
-                        .setId(user.id)
-                        .setEmail(user.email)
-                        .setFirstName(user.firstName)
-                        .setLastName(user.lastName)
-                        .setDisplayName(user.displayName)
-                        .build()
-                    continuation.resume(returning: .success(domainUser))
+                    continuation.resume(returning: .success(user.toDomainModel()))
+                } else {
+                    continuation.resume(returning: .failure(.operationFailed(self.invalidFormatError)))
+                }
+            }
+        }
+    }
+    
+    public func getProfile() async -> Result<DomainUser, UserError> {
+        return await withCheckedContinuation { continuation in
+            DefaultAPI.getProfile { data, error in
+                if let error = error {
+                    continuation.resume(returning: .failure(.networkError(error)))
+                    return
+                }
+                if let user = data {
+                    continuation.resume(returning: .success(user.toDomainModel()))
                 } else {
                     continuation.resume(returning: .failure(.operationFailed(self.invalidFormatError)))
                 }
