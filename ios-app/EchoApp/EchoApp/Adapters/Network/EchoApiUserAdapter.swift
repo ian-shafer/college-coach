@@ -2,15 +2,17 @@ import Foundation
 import EchoAPI
 
 public class EchoApiUserAdapter: UserRepository {
+    private let invalidFormatError = "Invalid API response format"
+
     public init() {}
     
-    public func updateProfile(payload: ProfileUpdate) async -> Result<DomainUser, UserError> {
+    public func updateProfile(_ update: ProfileUpdate) async -> Result<DomainUser, UserError> {
         let request = UpdateProfileRequest(
-            email: payload.email,
-            password: payload.password,
-            firstName: payload.firstName,
-            lastName: payload.lastName,
-            displayName: payload.displayName
+            email: update.email,
+            password: update.password,
+            firstName: update.firstName,
+            lastName: update.lastName,
+            displayName: update.displayName
         )
         
         return await withCheckedContinuation { continuation in
@@ -29,7 +31,7 @@ public class EchoApiUserAdapter: UserRepository {
                         .build()
                     continuation.resume(returning: .success(domainUser))
                 } else {
-                    continuation.resume(returning: .failure(.operationFailed("Invalid API response format")))
+                    continuation.resume(returning: .failure(.operationFailed(self.invalidFormatError)))
                 }
             }
         }

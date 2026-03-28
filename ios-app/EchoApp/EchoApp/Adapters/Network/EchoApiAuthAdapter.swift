@@ -2,11 +2,15 @@ import Foundation
 import EchoAPI
 
 public class EchoApiAuthAdapter: AuthRepository {
+    private let incompleteAuthError = "Incomplete credentials"
+    private let incompleteRegError = "Incomplete registration profile"
+    private let invalidFormatError = "Invalid API response format"
+
     public init() {}
     
     public func login(credentials: LoginCredentials) async -> Result<String, AuthError> {
         guard let email = credentials.email, let password = credentials.password else {
-            return .failure(.operationFailed("Incomplete credentials"))
+            return .failure(.operationFailed(incompleteAuthError))
         }
         let request = AuthRequest(email: email, password: password)
         
@@ -27,7 +31,7 @@ public class EchoApiAuthAdapter: AuthRepository {
     
     public func register(profile: RegisterProfile) async -> Result<String, AuthError> {
         guard let email = profile.email, let password = profile.password else {
-            return .failure(.operationFailed("Incomplete registration profile"))
+            return .failure(.operationFailed(incompleteRegError))
         }
         let request = AuthRequest(
             email: email,

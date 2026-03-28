@@ -12,7 +12,7 @@ struct EchoAppApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(authAdapter: authAdapter, userAdapter: userAdapter, sessionAdapter: sessionAdapter)
                 .environmentObject(store)
         }
     }

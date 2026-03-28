@@ -2,6 +2,7 @@ import Foundation
 import Combine
 
 @MainActor
+@MainActor
 public class ProfileViewModel: ObservableObject {
     @Published public var email = ""
     @Published public var password = ""
@@ -25,7 +26,7 @@ public class ProfileViewModel: ObservableObject {
         isLoading = true
         globalMessages.removeAll()
         
-        let payload = ProfileUpdate()
+        let update = ProfileUpdate()
             .setEmail(email.isEmpty ? nil : email)
             .setPassword(password.isEmpty ? nil : password)
             .setFirstName(firstName.isEmpty ? nil : firstName)
@@ -34,7 +35,7 @@ public class ProfileViewModel: ObservableObject {
             .build()
         
         Task {
-            let result = await userRepository.updateProfile(payload: payload)
+            let result = await userRepository.updateProfile(update)
             self.isLoading = false
             
             switch result {

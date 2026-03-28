@@ -3,10 +3,9 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject var store: Store<Session>
 
-    // Concrete adapters initialized matching dependency injection roots.
-    let authAdapter = EchoApiAuthAdapter()
-    let userAdapter = EchoApiUserAdapter()
-    let sessionAdapter = KeychainSessionAdapter.shared
+    let authAdapter: AuthRepository
+    let userAdapter: UserRepository
+    let sessionAdapter: SessionManager
     
     var body: some View {
         if store.state.isAuthenticated {
@@ -18,6 +17,6 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
-        .environmentObject(Store<Session>(initialState: KeychainSessionAdapter.shared.createSession()))
+    ContentView(authAdapter: EchoApiAuthAdapter(), userAdapter: EchoApiUserAdapter(), sessionAdapter: KeychainSessionAdapter())
+        .environmentObject(Store<Session>(initialState: KeychainSessionAdapter().createSession()))
 }
