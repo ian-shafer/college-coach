@@ -1,26 +1,46 @@
-# Implementation Plan: Executable Scripts Standardization & Lifecycle
+# Implementation Plan: iOS Authentication User Flows
 
-## Step 1: Initialize Local Directories & Provide Context Anchor
-**SDD Traceability:** Part 1, Success Criteria 1 & 6.
-- Write `bin/SPEC.md` documenting the new generic daemon architecture and boundary guidelines.
+## 📋 Proposed Changes
 
-## Step 2: Establish the Generic Daemon Engine Core
-**SDD Traceability:** Part 2, Generic Daemon Engine Requirement, Edge Cases 1 & 2.
-- Author `bin/wait-for`. Accept a timeout limit (e.g. `30s`), an optional `--period` poll frequency, and an arbitrary `$COMMAND...`. Loop the execution of the target `$COMMAND`. Upon receiving a successful `0` exit code from the command, immediately return `0`. If the timeout is reached before success, exit returning the command's last status code.
-- Author `bin/start-daemon`. Accept `$SERVICE_NAME` and `$PORT`. Trigger `mkdir -p var/run var/log` to isolate side-effects. Map `$PORT` into `var/run/$SERVICE_NAME.port`. Execute `docker compose up $SERVICE_NAME` in the background passing `$PORT` via environment variables, route logs to `var/log/$SERVICE_NAME.log`, extract `$!` into `var/run/$SERVICE_NAME.pid`, and invoke `bin/wait-for 30s bin/check-port $SERVICE_NAME` to handle the timeout barrier.
-- Author `bin/stop-daemon`. Verify `var/run/$SERVICE_NAME.pid` exists and exit if missing. Signal `kill -15 $PID` then utilize `bin/wait-for` to poll until `kill -0 $PID` fails (process is dead). Finally, clean up both the `.pid` and `.port` files.
-- Author `bin/check-pid`. Accept `$SERVICE_NAME`. Verify `var/run/$SERVICE_NAME.pid` exists (exit indicating missing process if not). Read the PID, invoke `kill -0 $PID`, and emit specific responses: `RUNNING (PID X)` or `STOPPED`.
-- Author `bin/check-port`. Accept `$SERVICE_NAME`. Verify `var/run/$SERVICE_NAME.port` exists (exit indicating missing port if not). Read the port, execute `nc -z localhost $PORT`, and emit port readiness status.
-- Author `bin/check-daemon`. Accept `$SERVICE_NAME`. Unify the evaluation process by executing both health sub-routines sequentially: `bin/check-pid $SERVICE_NAME && bin/check-port $SERVICE_NAME`.
+### 1. Core State Management
+#### [NEW] ios-app/EchoApp/EchoApp/SessionManager.swift
+- Create an `ObservableObject` tracking `isAuthenticated` by observing persistent `KeychainManager` availability.
+- Expose a strict `logout()` function that destroys keychain values and resets application states.
 
-## Step 3: Implement Thin Wrappers for `rest-server`
-**SDD Traceability:** Success Criteria 1-5, Orphaned Docker Bindings Edge Case.
-- Author `bin/start-rest-server`. Strip standalone logic and exclusively invoke `bin/start-daemon "rest-server" "8080"` cleanly.
-- Update `docker-compose.yml` and `application.conf` directly to map the incoming executing `$PORT` environmental variable fundamentally all the way through the Docker perimeter layer down explicitly to the Kotlin inner Ktor mapping.
-- Author `bin/stop-rest-server`. Wrap calls to `bin/stop-daemon "rest-server"`.
-- Author `bin/restart-rest-server`. Sequential execution: `bin/stop-rest-server && bin/start-rest-server`.
-- Author `bin/check-rest-server`. Execute `bin/check-daemon "rest-server"`.
+#### [MODIFY] ios-app/EchoApp/EchoApp/EchoAppApp.swift
+- Bootstrap `SessionManager` executing as a global `@StateObject` mapped into the application environment.
 
-## Step 4: Validate Script Execution Integrity
-**SDD Traceability:** Basic DevOps Standard.
-- Execute `chmod +x bin/*-daemon` ensuring structural permissions validate full UNIX functionality on Mac host machines.
+#### [MODIFY] ios-app/EchoApp/EchoApp/ContentView.swift
+- Architect a root path boundary rendering unauthenticated spaces (Login/Register Navigation Stack) or authenticated environments (e.g., Home/Profile Stack) evaluated upon `SessionManager` variables.
+
+### 2. Unauthenticated Logic
+#### [NEW] ios-app/EchoApp/EchoApp/LoginView.swift
+- Synthesize a reactive View displaying standard authentication form inputs.
+- Build a NavigationLink bouncing the client into the pre-existing `RegistrationView` structure.
+
+#### [NEW] ios-app/EchoApp/EchoApp/LoginViewModel.swift
+- Interface `EchoAPI.DefaultAPI.login(authRequest:)` against input states.
+- **Handle All Cases**: Define every execution branch ensuring networking errors trigger diagnostic UI properties without executing silent catch-alls.
+
+#### [MODIFY] ios-app/EchoApp/EchoApp/RegistrationViewModel.swift
+- Append post-completion routing bindings alerting `SessionManager` when secure payload evaluation finalizes.
+
+### 3. Authenticated Logic
+#### [NEW] ios-app/EchoApp/EchoApp/ProfileView.swift
+- Establish the baseline authenticated environment displaying core user identity attributes.
+- Construct input bindings handling local profile modifications over the network.
+- Expose the global unauthenticated exit point (Logout Hook).
+
+#### [NEW] ios-app/EchoApp/EchoApp/ProfileViewModel.swift
+- Map bindings down to `EchoAPI.DefaultAPI.usersMePatch(updateProfileRequest:)` updating remote identity constraints.
+- **Handle All Cases**: Map HTTP exception responses catching conflict/validation constraints across an exhaustive `switch` block.
+
+## 🧪 Verification Plan
+### Automated Testing
+- No isolated UI tests required, evaluating Swift compiler invariants ensuring exhaustive Switch conditionals evaluate all execution nodes.
+
+### Manual Verification
+- Mount the EchoApp Simulator mapping default Unauthenticated conditions on initial boot.
+- Perform Register and Login manual executions tracking the session transition into the authorized routes.
+- Mutate profile parameters executing PATCH constraints over authenticated networks.
+- Trigger Logout terminating persistent user flows routing the root index back to Login interfaces.
