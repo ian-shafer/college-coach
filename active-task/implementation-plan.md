@@ -3,11 +3,10 @@
 ## Step 1: Initialize Local Directories & Provide Context Anchor
 **SDD Traceability:** Part 1, Success Criteria 1 & 6.
 - Write `bin/SPEC.md` documenting the new generic daemon architecture and boundary guidelines.
-- Update `bin/common` to trigger `mkdir -p var/run` ensuring the tracking directory exists prior to any process initialization.
 
 ## Step 2: Establish the Generic Daemon Engine Core
 **SDD Traceability:** Part 2, Generic Daemon Engine Requirement, Edge Cases 1 & 2.
-- Author `bin/start-daemon`. Accept `$SERVICE_NAME`, `$COMMAND`, and `$PORT`. Background the execution via `&`, route logs, map `$!` into `var/run/$SERVICE_NAME.pid`, and loop `nc -z localhost $PORT` enforcing a `30s` timeout barrier to catch boot failures.
+- Author `bin/start-daemon`. Accept `$SERVICE_NAME`, `$COMMAND`, and `$PORT`. Trigger `mkdir -p var/run` here to prevent unnecessary global side-effects in `common`. Background the execution via `&`, route logs, map `$!` into `var/run/$SERVICE_NAME.pid`, and loop `nc -z localhost $PORT` enforcing a `30s` timeout barrier to catch boot failures.
 - Author `bin/stop-daemon`. Read the PID from `var/run/$SERVICE_NAME.pid`, signal `kill -15 $PID`, loop `kill -0 $PID` awaiting exit completion, and delete the `.pid` file.
 - Author `bin/check-daemon`. Read the `$PID` mapping, assert `kill -0 $PID`, and emit standard text formats `RUNNING (PID X)` or `STOPPED (Stale PID)` without masking background states.
 

@@ -5,6 +5,9 @@
 ## Communication Constraints
 1. **Adverb Restriction**: Avoid using superfluous "-ly" adverbs (e.g., aggressively, natively, strictly, rigorously). Keep technical communication clean, direct, and readable.
 
+## Scripting Constraints
+1. **No Unnecessary Side-Effects**: Do not place executing logic (e.g., `mkdir -p`) inside shared sourcing scripts like `bin/common` if not every caller needs it. Always scope side-effects tightly to the explicit scripts (e.g., `start-daemon`) that actually require them.
+
 ## SQLite & Exposed Extrapolations
 1. **Never String-Match SQLExceptions**: When tracking SQLite violations via Exposed, never parse `e.message` dynamically. Map `e.cause as? java.sql.SQLException` natively. The SQLite integer codes for strict constraints are `errorCode == 19` (Constraint) and `errorCode == 2067` (Unique Constraint).
 
