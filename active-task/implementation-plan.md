@@ -1,44 +1,23 @@
-# Implementation Plan: Profile Editing Endpoint
+# Implementation Plan: Executable Scripts Standardization & Lifecycle
 
-## Step 1: Update API Contract (Ports)
-Update `specs/api/main.tsp`.
-- Define model `UpdateProfileRequest` with optional `email`, `password`, `firstName`, `lastName`, and `displayName` fields.
-- Expose `@patch /users/me` resolving `User | BadRequestResponse | UnauthorizedResponse | ConflictResponse`.
+## Step 1: Initialize Local Directories & Provide Context Anchor
+**SDD Traceability:** Part 1, Success Criteria 1 & 6.
+- Write `bin/SPEC.md` documenting the new generic daemon architecture and boundary guidelines.
+- Update `bin/common` to trigger `mkdir -p var/run` ensuring the tracking directory exists prior to any process initialization.
 
-## Step 2: Regenerate SDKs
-Execute `./bin/build` unifying the TypeSpec contract into strict Kotlin DTO wrappers.
+## Step 2: Establish the Generic Daemon Engine Core
+**SDD Traceability:** Part 2, Generic Daemon Engine Requirement, Edge Cases 1 & 2.
+- Author `bin/start-daemon`. Accept `$SERVICE_NAME`, `$COMMAND`, and `$PORT`. Background the execution via `&`, route logs, map `$!` into `var/run/$SERVICE_NAME.pid`, and loop `nc -z localhost $PORT` enforcing a `30s` timeout barrier to catch boot failures.
+- Author `bin/stop-daemon`. Read the PID from `var/run/$SERVICE_NAME.pid`, signal `kill -15 $PID`, loop `kill -0 $PID` awaiting exit completion, and delete the `.pid` file.
+- Author `bin/check-daemon`. Read the `$PID` mapping, assert `kill -0 $PID`, and emit standard text formats `RUNNING (PID X)` or `STOPPED (Stale PID)` without masking background states.
 
-## Step 3: Domain Layer Core Interfaces
-Create `src/main/kotlin/com/echoapp/domain/Entity.kt`.
-- Define `interface Entity { val id: String; val createdAt: java.time.Instant; val updatedAt: java.time.Instant }`.
-- Define generic base repository: `interface EntityRepository<T : Entity>`.
+## Step 3: Implement Thin Wrappers for `rest-server`
+**SDD Traceability:** Success Criteria 1-5, Orphaned Docker Bindings Edge Case.
+- Author `bin/start-rest-server`. Strip complex payloads and invoke `bin/start-daemon "rest-server" "docker compose up rest-server" "8080"` bridging Docker wrapper host layers.
+- Author `bin/stop-rest-server`. Wrap calls to `bin/stop-daemon "rest-server"`.
+- Author `bin/restart-rest-server`. Sequential execution: `bin/stop-rest-server && bin/start-rest-server`.
+- Author `bin/check-rest-server`. Execute `bin/check-daemon "rest-server"`.
 
-## Step 4: Domain Layer User Model
-Create `src/main/kotlin/com/echoapp/domain/User.kt`.
-- Define pure domain entity natively extending the core structure: `data class User(override val id: String, val email: String, val firstName: String?, val lastName: String?, val displayName: String?, val createdAt: java.time.Instant, val updatedAt: java.time.Instant) : Entity`.
-
-## Step 5: Domain Layer Verification Models
-Create `src/main/kotlin/com/echoapp/domain/Validation.kt`.
-- Define `sealed class ValidationResult { object Valid : ValidationResult(); data class Invalid(val messages: List<String> = emptyList(), val errors: Map<String, String> = emptyMap()) : ValidationResult() }`.
-- Define `interface Validator<T> { fun validate(subject: T): ValidationResult }`.
-- Implement `ProfileValidator : Validator<UserUpdate>` asserting constraints independent of external framework logic.
-
-## Step 6: Domain Layer Data Output Models
-Create `src/main/kotlin/com/echoapp/domain/UserRepository.kt`.
-- Define `data class UserUpdate(val email: String? = null, val password: String? = null, val firstName: String? = null, val lastName: String? = null, val displayName: String? = null)`.
-- Define `sealed class ProfileUpdateResult { data class Success(val user: User) : ProfileUpdateResult(); data class Conflict(val reason: String) : ProfileUpdateResult() }`.
-- Define dynamic port: `interface UserRepository : EntityRepository<User> { fun updateProfile(userId: String, updates: UserUpdate): ProfileUpdateResult }`.
-
-## Step 7: Data Layer SQLite Adapter
-Create `src/main/kotlin/com/echoapp/server/adapters/SqlUserRepository.kt`.
-- Implement `UserRepository` executing Exposed relational operations.
-- Detect duplicate emails natively resolving outputs into raw `ProfileUpdateResult.Conflict` constraints.
-
-## Step 8: HTTP Router Adapter
-Create `src/main/kotlin/com/echoapp/server/routes/UserRoutes.kt`.
-- Intercept `@patch /users/me` enforcing the `authenticate("auth-jwt")` boundary.
-- Rigorously map HTTP inputs into the `UserUpdate` domain object.
-- Explicitly map the resulting Domain `User` natively back into the generated TypeSpec `com.echoapp.models.User` DTO structure.
-
-## Step 9: Application Hand-Wiring
-Modify `Application.kt` manually injecting the adapter structures explicitly down into `userRoutes(...)`.
+## Step 4: Validate Script Execution Integrity
+**SDD Traceability:** Basic DevOps Standard.
+- Execute `chmod +x bin/*-daemon` ensuring structural permissions validate full UNIX functionality on Mac host machines.
