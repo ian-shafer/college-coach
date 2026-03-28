@@ -94,3 +94,7 @@ model UpdateProfileRequest {
 @route("/users/me")
 @patch
 op updateProfile(@body body: UpdateProfileRequest): User | BadRequestResponse | UnauthorizedResponse | ConflictResponse;
+
+@route("/users/me")
+@get
+op getProfile(): User | UnauthorizedResponse;

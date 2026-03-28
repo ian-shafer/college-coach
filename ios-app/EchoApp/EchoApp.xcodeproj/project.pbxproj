@@ -14,9 +14,24 @@
 		3CE9D1912F70CED20037208F /* EchoApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EchoApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		3CE9D25D2F786EEB0037208F /* Exceptions for "EchoApp" folder in "EchoApp" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Adapters/SPEC.md,
+				Domain/SPEC.md,
+				Presentation/SPEC.md,
+			);
+			target = 3CE9D1902F70CED20037208F /* EchoApp */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		3CE9D1932F70CED20037208F /* EchoApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				3CE9D25D2F786EEB0037208F /* Exceptions for "EchoApp" folder in "EchoApp" target */,
+			);
 			path = EchoApp;
 			sourceTree = "<group>";
 		};

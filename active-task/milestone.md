@@ -1,27 +1,19 @@
-# Milestone: iOS Authentication User Flows
+# Milestone: Backend Profile Fetch Endpoint
+To provide clients with access to the user's existing profile properties, we must expose a secure REST endpoint referencing the active session's parameters. This necessitates extending the TypeSpec definition, compiling the new schema definitions, and implementing the Kotlin auth route querying the database.
 
-## 🎯 Objective
-Establish a robust native iOS authentication framework supporting end-to-end user lifecycle management. 
-An unauthenticated user must be able to register a new account or log into an existing one. 
-Once authenticated, a user must be able to view/edit their profile or terminate their session via logout.
+## Success Criteria
+- `TypeSpec` outputs a new explicit `@get` `getProfile` signature under `/users/me`.
+- Kotlin Ktor endpoints secure the route validating the UUID mapping matching the active requester.
+- The endpoint returns a valid `User` model payload passing standard authentication checks.
 
-## 📋 Requirements
+## Edge Cases
+- Invalid or expired tokens requesting `/users/me` throwing `UnauthorizedResponse`.
 
-### 1. Unauthenticated Flows
-- **Login**: Build a `LoginView` capturing user credentials, triggering a handshake with the Ktor backend, and routing the JWT token into `KeychainManager`.
-- **Registration**: Finalize the `RegistrationView` pipeline mapping form validation state and providing seamless routing into the authenticated application root view.
+## Dependencies
+- Active JWT Authentication infrastructure validating mapped headers.
 
-### 2. Authenticated Flows
-- **Profile Management**: Build a `ProfileView` enabling the user to edit their profile details and persist mutations against the backend.
-- **Logout**: Implement an architectural logout hook that purges active keychain tokens and redirects the application root view back to unauthenticated space.
+# Part 1: TypeSpec & API Generation
+Add the `@get` endpoint structural rule mapping a `User` model output. Trigger local code generation.
 
-### 3. Required Engineering Standard
-- **Handle All Cases**: All Swift `switch` evaluations, `Result` mappings, and network response decoding blocks must execute exhaustive constraints. Code must never utilize default swallowing (`default:`) for UI state transitions or backend logic paths.
-
-## 📈 Acceptance Criteria
-1. Device launches dynamically resolving root views based on persistent `KeychainManager` token status.
-2. Unauthenticated users can choose to Login or Register.
-3. Successful Login/Registration routes the local device to the core App view.
-4. Authenticated users can modify their profile payload.
-5. Users can log out, which destroys the JWT and repaints the initial navigation gate.
-6. All conditional edges (network failures, invalid tokens, formatting boundaries) actively surface mapped error states instead of crashing or hanging silently.
+# Part 2: Backend Implementation
+Add `.get("/me")` routing under the Auth block translating the JWT principal into a structured `User` payload referencing the Exposed `Users` table.
