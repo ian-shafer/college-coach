@@ -1,6 +1,24 @@
 import Foundation
 import EchoAPI
 
+private extension Error {
+    func toAuthError() -> AuthError {
+        if let apiError = self as? ErrorResponse {
+            switch apiError {
+            case .error(let statusCode, let data, _, let underlyingError):
+                if statusCode == 401 {
+                    return .operationFailed("HTTP [401]: Unauthorized credentials.")
+                }
+                if let data = data, let stringData = String(data: data, encoding: .utf8) {
+                    return .operationFailed("HTTP [\(statusCode)]: \(stringData)")
+                }
+                return .networkError(underlyingError)
+            }
+        }
+        return .networkError(self)
+    }
+}
+
 public class EchoApiAuthAdapter: AuthRepository {
     private let incompleteAuthError = "Incomplete credentials"
     private let incompleteRegError = "Incomplete registration profile"
@@ -17,7 +35,7 @@ public class EchoApiAuthAdapter: AuthRepository {
         return await withCheckedContinuation { continuation in
             DefaultAPI.login(authRequest: request) { data, error in
                 if let error = error {
-                    continuation.resume(returning: .failure(.networkError(error)))
+                    continuation.resume(returning: .failure(error.toAuthError()))
                     return
                 }
                 if let token = data?.token {
@@ -44,7 +62,7 @@ public class EchoApiAuthAdapter: AuthRepository {
         return await withCheckedContinuation { continuation in
             DefaultAPI.register(authRequest: request) { data, error in
                 if let error = error {
-                    continuation.resume(returning: .failure(.networkError(error)))
+                    continuation.resume(returning: .failure(error.toAuthError()))
                     return
                 }
                 if let token = data?.token {

@@ -11,6 +11,11 @@ The LLM / Agent must always adhere to the following rules when designing or impl
 ## Interacting with the Architect
 1. **Architectural Review Required:** Never run `git commit` or `git push` without allowing the architect to view the full `git diff`. The architect must manually approve code changes with an `LGTM` comment before they are committed. **Exception:** The file `context/agent-learnings.md` is an autonomous operational memory buffer. The agent has absolute permission to aggressively append, edit, and commit `context/agent-learnings.md` entirely without requiring any architect review or `LGTM` triggers.
 2. **Continuous Agent Learning:** Every time the architect corrects an implementation mistake or requests a specific codebase adjustment, the agent MUST strongly prioritize autonomously updating `context/agent-learnings.md` with the new operational pattern natively. The agent must strictly keep both `context/agent-learnings.md` and `context/laws.md` actively front-loaded in its priority context window at all times.
+3. **Status Check Protocol:** Whenever the architect asks "What is our status?", the agent MUST output:
+   * The current milestone being worked on.
+   * The current phase of the lifecycle.
+   * The next phase to be executed.
+   * The list of pending milestones blocked by the current one (e.g., parent milestones stacked behind sub-milestones).
 
 ## Coding
 
@@ -129,11 +134,12 @@ Every significant architectural directory (e.g., `domain/`, `adapters/`, specifi
    * **Phase 6: Review**: Review the milestone with fresh eyes to ensure it follows all laws and guidelines -- especially the laws defined in this document.
    * **Phase 7: Commit**: Commit the milestone to the codebase after the architect approves the changes with an explicit `LGTM` comment.
 2. **Milestone Interruptions (Sub-Milestones):** If the current active milestone requires completing a new sub-milestone, execute the following steps:
-   1. `git stash` the current changes.
-   2. Check out a fresh `git branch` for the new milestone.
-   3. Execute the milestone lifecycle on the new branch.
-   4. Once the sub-milestone is complete, `git rebase` its branch onto the initial milestone branch.
-   5. `git stash pop` the stashed changes.
-   6. Resume execution on the initial milestone.
+   1. **Approval Required**: Before switching to a new sub-milestone, you MUST first get the architect's explicit `LGTM` approval to interrupt the current flow.
+   2. `git stash` the current changes.
+   3. Check out a fresh `git branch` for the new milestone.
+   4. Execute the milestone lifecycle on the new branch.
+   5. Once the sub-milestone is complete, `git rebase` its branch onto the initial milestone branch.
+   6. `git stash pop` the stashed changes.
+   7. Resume execution on the initial milestone.
 3. **Unspecified Choices:** When encountering an implementation detail or library choice not explicitly specified by the user (e.g., a hashing algorithm or database driver), ALWAYS ask the user before adding it to the implementation plan. Never make unprompted architectural assumptions.
 4. **Presenting Options:** When presenting architectural or library options to the user, provide a short description for each option and include a clear recommendation.

@@ -13,6 +13,24 @@ private extension User {
     }
 }
 
+private extension Error {
+    func toUserError() -> UserError {
+        if let apiError = self as? ErrorResponse {
+            switch apiError {
+            case .error(let statusCode, let data, _, let underlyingError):
+                if statusCode == 401 {
+                    return .operationFailed("HTTP [401]: Unauthorized access. Please log in again.")
+                }
+                if let data = data, let stringData = String(data: data, encoding: .utf8) {
+                    return .operationFailed("HTTP [\(statusCode)]: \(stringData)")
+                }
+                return .networkError(underlyingError)
+            }
+        }
+        return .networkError(self)
+    }
+}
+
 public class EchoApiUserAdapter: UserRepository {
     private let invalidFormatError = "Invalid API response format"
 
@@ -30,7 +48,7 @@ public class EchoApiUserAdapter: UserRepository {
         return await withCheckedContinuation { continuation in
             DefaultAPI.updateProfile(updateProfileRequest: request) { data, error in
                 if let error = error {
-                    continuation.resume(returning: .failure(.networkError(error)))
+                    continuation.resume(returning: .failure(error.toUserError()))
                     return
                 }
                 if let user = data {
@@ -46,7 +64,7 @@ public class EchoApiUserAdapter: UserRepository {
         return await withCheckedContinuation { continuation in
             DefaultAPI.getProfile { data, error in
                 if let error = error {
-                    continuation.resume(returning: .failure(.networkError(error)))
+                    continuation.resume(returning: .failure(error.toUserError()))
                     return
                 }
                 if let user = data {
@@ -58,3 +76,5 @@ public class EchoApiUserAdapter: UserRepository {
         }
     }
 }
+
+
