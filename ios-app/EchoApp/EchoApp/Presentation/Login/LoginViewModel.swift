@@ -36,10 +36,10 @@ public class LoginViewModel: ObservableObject {
         guard validate() else { return }
         isLoading = true
         
-        let credentials = LoginCredentials(
-            email: email.trimmingCharacters(in: .whitespaces),
-            password: password
-        )
+        let credentials = LoginCredentials()
+            .setEmail(email.trimmingCharacters(in: .whitespaces))
+            .setPassword(password)
+            .build()
         
         Task {
             let result = await authRepository.login(credentials: credentials)

@@ -39,7 +39,7 @@ public class ProfileViewModel: ObservableObject {
             
             switch result {
             case .success(let user):
-                self.email = user.email
+                self.email = user.email ?? ""
                 self.firstName = user.firstName ?? ""
                 self.lastName = user.lastName ?? ""
                 self.displayName = user.displayName ?? ""

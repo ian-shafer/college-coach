@@ -43,11 +43,20 @@ public struct ProfileUpdate {
 }
 
 public struct DomainUser {
-    public let id: String
-    public let email: String
-    public let firstName: String?
-    public let lastName: String?
-    public let displayName: String?
+    public private(set) var id: String? = nil
+    public private(set) var email: String? = nil
+    public private(set) var firstName: String? = nil
+    public private(set) var lastName: String? = nil
+    public private(set) var displayName: String? = nil
+    
+    public init() {}
+    
+    public func setId(_ id: String?) -> DomainUser { var copy = self; copy.id = id; return copy }
+    public func setEmail(_ email: String?) -> DomainUser { var copy = self; copy.email = email; return copy }
+    public func setFirstName(_ firstName: String?) -> DomainUser { var copy = self; copy.firstName = firstName; return copy }
+    public func setLastName(_ lastName: String?) -> DomainUser { var copy = self; copy.lastName = lastName; return copy }
+    public func setDisplayName(_ displayName: String?) -> DomainUser { var copy = self; copy.displayName = displayName; return copy }
+    public func build() -> DomainUser { return self }
 }
 
 public enum UserError: Error {

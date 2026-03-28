@@ -60,13 +60,13 @@ public class RegistrationViewModel: ObservableObject {
             reqDisplayName = reqFirstName
         }
         
-        let profile = RegisterProfile(
-            email: reqEmail,
-            password: reqPassword,
-            firstName: reqFirstName.isEmpty ? nil : reqFirstName,
-            lastName: reqLastName.isEmpty ? nil : reqLastName,
-            displayName: reqDisplayName.isEmpty ? nil : reqDisplayName
-        )
+        let profile = RegisterProfile()
+            .setEmail(reqEmail)
+            .setPassword(reqPassword)
+            .setFirstName(reqFirstName.isEmpty ? nil : reqFirstName)
+            .setLastName(reqLastName.isEmpty ? nil : reqLastName)
+            .setDisplayName(reqDisplayName.isEmpty ? nil : reqDisplayName)
+            .build()
         
         Task {
             let result = await authRepository.register(profile: profile)

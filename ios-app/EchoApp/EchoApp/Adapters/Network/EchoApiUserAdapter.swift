@@ -20,13 +20,13 @@ public class EchoApiUserAdapter: UserRepository {
                     return
                 }
                 if let user = data {
-                    let domainUser = DomainUser(
-                        id: user.id,
-                        email: user.email,
-                        firstName: user.firstName,
-                        lastName: user.lastName,
-                        displayName: user.displayName
-                    )
+                    let domainUser = DomainUser()
+                        .setId(user.id)
+                        .setEmail(user.email)
+                        .setFirstName(user.firstName)
+                        .setLastName(user.lastName)
+                        .setDisplayName(user.displayName)
+                        .build()
                     continuation.resume(returning: .success(domainUser))
                 } else {
                     continuation.resume(returning: .failure(.operationFailed("Invalid API response format")))

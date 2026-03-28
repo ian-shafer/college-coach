@@ -1,29 +1,31 @@
 import Foundation
 
 public struct LoginCredentials {
-    public let email: String
-    public let password: String
+    public private(set) var email: String? = nil
+    public private(set) var password: String? = nil
     
-    public init(email: String, password: String) {
-        self.email = email
-        self.password = password
-    }
+    public init() {}
+    
+    public func setEmail(_ email: String?) -> LoginCredentials { var copy = self; copy.email = email; return copy }
+    public func setPassword(_ password: String?) -> LoginCredentials { var copy = self; copy.password = password; return copy }
+    public func build() -> LoginCredentials { return self }
 }
 
 public struct RegisterProfile {
-    public let email: String
-    public let password: String
-    public let firstName: String?
-    public let lastName: String?
-    public let displayName: String?
+    public private(set) var email: String? = nil
+    public private(set) var password: String? = nil
+    public private(set) var firstName: String? = nil
+    public private(set) var lastName: String? = nil
+    public private(set) var displayName: String? = nil
     
-    public init(email: String, password: String, firstName: String? = nil, lastName: String? = nil, displayName: String? = nil) {
-        self.email = email
-        self.password = password
-        self.firstName = firstName
-        self.lastName = lastName
-        self.displayName = displayName
-    }
+    public init() {}
+    
+    public func setEmail(_ email: String?) -> RegisterProfile { var copy = self; copy.email = email; return copy }
+    public func setPassword(_ password: String?) -> RegisterProfile { var copy = self; copy.password = password; return copy }
+    public func setFirstName(_ firstName: String?) -> RegisterProfile { var copy = self; copy.firstName = firstName; return copy }
+    public func setLastName(_ lastName: String?) -> RegisterProfile { var copy = self; copy.lastName = lastName; return copy }
+    public func setDisplayName(_ displayName: String?) -> RegisterProfile { var copy = self; copy.displayName = displayName; return copy }
+    public func build() -> RegisterProfile { return self }
 }
 
 public enum AuthError: Error {
