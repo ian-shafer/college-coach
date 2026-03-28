@@ -1,22 +1,27 @@
 import Foundation
 import Combine
-import EchoAPI
 
 @MainActor
-class RegistrationViewModel: ObservableObject {
-    @Published var email = ""
-    @Published var password = ""
-    @Published var firstName = ""
-    @Published var lastName = ""
-    @Published var displayName = ""
+public class RegistrationViewModel: ObservableObject {
+    @Published public var email = ""
+    @Published public var password = ""
+    @Published public var firstName = ""
+    @Published public var lastName = ""
+    @Published public var displayName = ""
     
-    @Published var fieldErrors: [String: String] = [:]
-    @Published var globalMessages: [String] = []
+    @Published public var fieldErrors: [String: String] = [:]
+    @Published public var globalMessages: [String] = []
     
-    @Published var isLoading = false
-    @Published var isRegistered = false
+    @Published public var isLoading = false
+    @Published public var isRegistered = false
     
-    func validate() -> Bool {
+    private let authRepository: AuthRepositoryPort
+    
+    public init(authRepository: AuthRepositoryPort) {
+        self.authRepository = authRepository
+    }
+    
+    public func validate() -> Bool {
         fieldErrors.removeAll()
         globalMessages.removeAll()
         
@@ -39,9 +44,8 @@ class RegistrationViewModel: ObservableObject {
         return fieldErrors.isEmpty
     }
     
-    func register() {
+    public func register(sessionState: SessionState) {
         guard validate() else { return }
-        
         isLoading = true
         
         let reqEmail = email.trimmingCharacters(in: .whitespaces)
@@ -54,7 +58,7 @@ class RegistrationViewModel: ObservableObject {
             reqDisplayName = reqFirstName
         }
         
-        let request = AuthRequest(
+        let profile = RegisterProfile(
             email: reqEmail,
             password: reqPassword,
             firstName: reqFirstName.isEmpty ? nil : reqFirstName,
@@ -62,38 +66,20 @@ class RegistrationViewModel: ObservableObject {
             displayName: reqDisplayName.isEmpty ? nil : reqDisplayName
         )
         
-        DefaultAPI.register(authRequest: request) { data, error in
-            DispatchQueue.main.async {
+        Task {
+            do {
+                let token = try await authRepository.register(profile: profile)
                 self.isLoading = false
-                
-                if let error = error {
-                    self.handleError(error)
-                    return
-                }
-                
-                if let response = data {
-                    KeychainManager.shared.saveToken(response.token)
-                    self.isRegistered = true
-                }
+                self.isRegistered = true
+                sessionState.login(token: token)
+            } catch {
+                self.isLoading = false
+                self.handleError(error)
             }
         }
     }
     
     private func handleError(_ error: Error) {
-        if let errorResponse = error as? ErrorResponse, case let .error(_, data, _, _) = errorResponse, let errorData = data {
-            do {
-                let errorBody = try JSONDecoder().decode(ErrorResponseBody.self, from: errorData)
-                if let apiErrors = errorBody.errors {
-                    self.fieldErrors = apiErrors
-                }
-                if let apiMessages = errorBody.messages {
-                    self.globalMessages = apiMessages
-                }
-            } catch {
-                self.globalMessages = ["Failed to parse error payload"]
-            }
-        } else {
-            self.globalMessages = [error.localizedDescription]
-        }
+        self.globalMessages = [error.localizedDescription]
     }
 }
