@@ -25,13 +25,13 @@ public class ProfileViewModel: ObservableObject {
         isLoading = true
         globalMessages.removeAll()
         
-        let payload = ProfileUpdate(
-            email: email.isEmpty ? nil : email,
-            password: password.isEmpty ? nil : password,
-            firstName: firstName.isEmpty ? nil : firstName,
-            lastName: lastName.isEmpty ? nil : lastName,
-            displayName: displayName.isEmpty ? nil : displayName
-        )
+        let payload = ProfileUpdate()
+            .setEmail(email.isEmpty ? nil : email)
+            .setPassword(password.isEmpty ? nil : password)
+            .setFirstName(firstName.isEmpty ? nil : firstName)
+            .setLastName(lastName.isEmpty ? nil : lastName)
+            .setDisplayName(displayName.isEmpty ? nil : displayName)
+            .build()
         
         Task {
             do {
