@@ -24,18 +24,18 @@ shift
 COMMAND=("$@")
 
 # Convert timeout limit to integer seconds supporting s, m, h, d modifiers
-TIMEOUT_VAL="${TIMEOUT_STR%%[a-zA-Z]*}"
+TIMEOUT_SECONDS="${TIMEOUT_STR%%[a-zA-Z]*}"
 case "$TIMEOUT_STR" in
-    *m*) TIMEOUT_VAL=$((TIMEOUT_VAL * 60)) ;;
-    *h*) TIMEOUT_VAL=$((TIMEOUT_VAL * 3600)) ;;
-    *d*) TIMEOUT_VAL=$((TIMEOUT_VAL * 86400)) ;;
+    *m*) TIMEOUT_SECONDS=$((TIMEOUT_SECONDS * 60)) ;;
+    *h*) TIMEOUT_SECONDS=$((TIMEOUT_SECONDS * 3600)) ;;
+    *d*) TIMEOUT_SECONDS=$((TIMEOUT_SECONDS * 86400)) ;;
     *s*|*) ;; # seconds is the default unit
 esac
 
 SECONDS=0
 LAST_STATUS=1
 
-while [ $SECONDS -lt $TIMEOUT_VAL ]; do
+while [ $SECONDS -lt $TIMEOUT_SECONDS ]; do
     "${COMMAND[@]}"
     LAST_STATUS=$?
 
