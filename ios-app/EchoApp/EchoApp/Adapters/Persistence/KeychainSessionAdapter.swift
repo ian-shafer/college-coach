@@ -19,14 +19,14 @@ public class KeychainSessionAdapter: SessionManager {
         let status = SecItemCopyMatching(query as CFDictionary, &dataTypeRef)
         
         if status == errSecSuccess, let data = dataTypeRef as? Data, let token = String(data: data, encoding: .utf8) {
-            return Session(token: token)
+            return Session().setToken(token).build()
         }
-        return Session(token: nil)
+        return Session().build()
     }
     
     public func setToken(_ session: Session, token: String) -> Session {
         guard let data = token.data(using: .utf8) else {
-            return Session(token: nil)
+            return Session().build()
         }
         
         let query: [String: Any] = [
@@ -38,7 +38,7 @@ public class KeychainSessionAdapter: SessionManager {
         SecItemDelete(query as CFDictionary)
         SecItemAdd(query as CFDictionary, nil)
         
-        return Session(token: token)
+        return Session().setToken(token).build()
     }
     
     public func logout(_ session: Session) -> Session {
@@ -48,6 +48,6 @@ public class KeychainSessionAdapter: SessionManager {
         ]
         
         SecItemDelete(query as CFDictionary)
-        return Session(token: nil)
+        return Session().build()
     }
 }

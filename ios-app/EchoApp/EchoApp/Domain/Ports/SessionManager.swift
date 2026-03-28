@@ -1,15 +1,16 @@
 import Foundation
 
 public struct Session {
-    public let token: String?
+    public private(set) var token: String? = nil
     
     public var isAuthenticated: Bool {
         return token != nil
     }
     
-    public init(token: String? = nil) {
-        self.token = token
-    }
+    public init() {}
+    
+    public func setToken(_ token: String?) -> Session { var copy = self; copy.token = token; return copy }
+    public func build() -> Session { return self }
 }
 
 public protocol SessionManager {
