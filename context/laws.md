@@ -10,6 +10,7 @@ The LLM / Agent must always adhere to the following rules when designing or impl
 
 ## Interacting with the Architect
 1. **Architectural Review Required:** Never run `git commit` or `git push` without allowing the architect to view the full `git diff`. The architect must manually approve code changes with an `LGTM` comment before they are committed. **Exception:** The file `context/agent-learnings.md` is an autonomous operational memory buffer. The agent has absolute permission to aggressively append, edit, and commit `context/agent-learnings.md` entirely without requiring any architect review or `LGTM` triggers.
+2. **Continuous Agent Learning:** Every time the architect corrects an implementation mistake or requests a specific codebase adjustment, the agent MUST strongly prioritize autonomously updating `context/agent-learnings.md` with the new operational pattern natively. The agent must strictly keep both `context/agent-learnings.md` and `context/laws.md` actively front-loaded in its priority context window at all times.
 
 ## Coding
 
