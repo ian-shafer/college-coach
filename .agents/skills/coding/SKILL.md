@@ -17,3 +17,7 @@ This skill establishes the universal logic constraints that apply across all pro
 2. **Handle All Cases** (Exhaustive Evaluation)
    - The execution flow must be robust and explicitly address every possible input state, network error, or logic branch.
    - Never implement partial conditional evaluations or assume "default" closures cover unhandled edge cases.
+
+3. **No Sentinel Nulls or Empty Strings** (Explicit Initialization)
+   - NEVER use nulls or empty strings to represent an uninitialized state.
+   - Prefer either initializing the variable with a concrete default value or using an explicit optional type (e.g., TypeScript's `string?` or Swift's `String?`).
