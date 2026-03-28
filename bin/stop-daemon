@@ -28,7 +28,7 @@ PID_FILE="var/run/$SERVICE_NAME.pid"
 PORT_FILE="var/run/$SERVICE_NAME.port"
 
 if [ ! -f "$PID_FILE" ]; then
-    echo "Service $SERVICE_NAME is not running (No PID file)."
+    echo "Service $SERVICE_NAME is not running (no PID file)."
     exit 0
 fi
 
@@ -36,7 +36,10 @@ PID=$(cat "$PID_FILE")
 echo "Stopping $SERVICE_NAME (PID $PID)..."
 kill -15 "$PID" >/dev/null 2>&1 || true
 
-bin/wait-for 30 bash -c "! bin/check-pid \"$SERVICE_NAME\" >/dev/null 2>&1"
+if ! bin/wait-for 30s bash -c "! bin/check-pid \"$SERVICE_NAME\" >/dev/null 2>&1"; then
+    echo "Error: $SERVICE_NAME (PID $PID) failed to stop within 30s." >&2
+    exit 1
+fi
 
 echo "Service $SERVICE_NAME stopped."
 rm -f "$PID_FILE" "$PORT_FILE"
