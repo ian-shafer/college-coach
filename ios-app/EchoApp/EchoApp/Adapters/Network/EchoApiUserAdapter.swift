@@ -4,7 +4,7 @@ import EchoAPI
 public class EchoApiUserAdapter: UserRepository {
     public init() {}
     
-    public func updateProfile(payload: ProfileUpdate) async throws -> DomainUser {
+    public func updateProfile(payload: ProfileUpdate) async -> Result<DomainUser, UserError> {
         let request = UpdateProfileRequest(
             email: payload.email,
             password: payload.password,
@@ -13,10 +13,10 @@ public class EchoApiUserAdapter: UserRepository {
             displayName: payload.displayName
         )
         
-        return try await withCheckedThrowingContinuation { continuation in
+        return await withCheckedContinuation { continuation in
             DefaultAPI.usersMePatch(updateProfileRequest: request) { data, error in
                 if let error = error {
-                    continuation.resume(throwing: error)
+                    continuation.resume(returning: .failure(.networkError(error)))
                     return
                 }
                 if let user = data {
@@ -27,10 +27,9 @@ public class EchoApiUserAdapter: UserRepository {
                         lastName: user.lastName,
                         displayName: user.displayName
                     )
-                    continuation.resume(returning: domainUser)
+                    continuation.resume(returning: .success(domainUser))
                 } else {
-                    let err = NSError(domain: "EchoApiUserAdapter", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid API response format"])
-                    continuation.resume(throwing: err)
+                    continuation.resume(returning: .failure(.operationFailed("Invalid API response format")))
                 }
             }
         }

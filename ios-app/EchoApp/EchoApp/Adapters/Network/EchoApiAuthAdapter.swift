@@ -4,26 +4,25 @@ import EchoAPI
 public class EchoApiAuthAdapter: AuthRepository {
     public init() {}
     
-    public func login(credentials: LoginCredentials) async throws -> String {
+    public func login(credentials: LoginCredentials) async -> Result<String, AuthError> {
         let request = AuthRequest(email: credentials.email, password: credentials.password)
         
-        return try await withCheckedThrowingContinuation { continuation in
+        return await withCheckedContinuation { continuation in
             DefaultAPI.login(authRequest: request) { data, error in
                 if let error = error {
-                    continuation.resume(throwing: error)
+                    continuation.resume(returning: .failure(.networkError(error)))
                     return
                 }
                 if let token = data?.token {
-                    continuation.resume(returning: token)
+                    continuation.resume(returning: .success(token))
                 } else {
-                    let err = NSError(domain: "EchoApiAuthAdapter", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid API response format"])
-                    continuation.resume(throwing: err)
+                    continuation.resume(returning: .failure(.operationFailed("Invalid API response format")))
                 }
             }
         }
     }
     
-    public func register(profile: RegisterProfile) async throws -> String {
+    public func register(profile: RegisterProfile) async -> Result<String, AuthError> {
         let request = AuthRequest(
             email: profile.email,
             password: profile.password,
@@ -32,17 +31,16 @@ public class EchoApiAuthAdapter: AuthRepository {
             displayName: profile.displayName
         )
         
-        return try await withCheckedThrowingContinuation { continuation in
+        return await withCheckedContinuation { continuation in
             DefaultAPI.register(authRequest: request) { data, error in
                 if let error = error {
-                    continuation.resume(throwing: error)
+                    continuation.resume(returning: .failure(.networkError(error)))
                     return
                 }
                 if let token = data?.token {
-                    continuation.resume(returning: token)
+                    continuation.resume(returning: .success(token))
                 } else {
-                    let err = NSError(domain: "EchoApiAuthAdapter", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid API response format"])
-                    continuation.resume(throwing: err)
+                    continuation.resume(returning: .failure(.operationFailed("Invalid API response format")))
                 }
             }
         }

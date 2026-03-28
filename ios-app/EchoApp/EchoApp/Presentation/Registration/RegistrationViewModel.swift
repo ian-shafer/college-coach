@@ -69,13 +69,13 @@ public class RegistrationViewModel: ObservableObject {
         )
         
         Task {
-            do {
-                let token = try await authRepository.register(profile: profile)
-                self.isLoading = false
+            let result = await authRepository.register(profile: profile)
+            self.isLoading = false
+            switch result {
+            case .success(let token):
                 self.isRegistered = true
                 store.state = self.sessionManager.setToken(store.state, token: token)
-            } catch {
-                self.isLoading = false
+            case .failure(let error):
                 self.handleError(error)
             }
         }

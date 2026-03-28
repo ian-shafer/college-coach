@@ -56,6 +56,11 @@ public struct DomainUser {
     public let displayName: String?
 }
 
+public enum UserError: Error {
+    case operationFailed(String)
+    case networkError(Error)
+}
+
 public protocol UserRepository {
-    func updateProfile(payload: ProfileUpdate) async throws -> DomainUser
+    func updateProfile(payload: ProfileUpdate) async -> Result<DomainUser, UserError>
 }

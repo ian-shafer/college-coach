@@ -34,18 +34,18 @@ public class ProfileViewModel: ObservableObject {
             .build()
         
         Task {
-            do {
-                let user = try await userRepository.updateProfile(payload: payload)
+            let result = await userRepository.updateProfile(payload: payload)
+            self.isLoading = false
+            
+            switch result {
+            case .success(let user):
                 self.email = user.email
                 self.firstName = user.firstName ?? ""
                 self.lastName = user.lastName ?? ""
                 self.displayName = user.displayName ?? ""
                 self.password = ""
-                
-                self.isLoading = false
                 self.isUpdated = true
-            } catch {
-                self.isLoading = false
+            case .failure(let error):
                 self.handleError(error)
             }
         }

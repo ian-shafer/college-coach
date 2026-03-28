@@ -26,7 +26,12 @@ public struct RegisterProfile {
     }
 }
 
+public enum AuthError: Error {
+    case operationFailed(String)
+    case networkError(Error)
+}
+
 public protocol AuthRepository {
-    func login(credentials: LoginCredentials) async throws -> String
-    func register(profile: RegisterProfile) async throws -> String
+    func login(credentials: LoginCredentials) async -> Result<String, AuthError>
+    func register(profile: RegisterProfile) async -> Result<String, AuthError>
 }

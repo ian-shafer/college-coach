@@ -42,12 +42,12 @@ public class LoginViewModel: ObservableObject {
         )
         
         Task {
-            do {
-                let token = try await authRepository.login(credentials: credentials)
-                self.isLoading = false
+            let result = await authRepository.login(credentials: credentials)
+            self.isLoading = false
+            switch result {
+            case .success(let token):
                 store.state = self.sessionManager.setToken(store.state, token: token)
-            } catch {
-                self.isLoading = false
+            case .failure(let error):
                 self.handleError(error)
             }
         }
