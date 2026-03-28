@@ -21,3 +21,5 @@
 
 ## State Management
 1. **Functional State Mutations**: All persistent state engines (like `Keychain` interfaces or Domain models tracking properties) must structure immutable objects preventing `Void` side-effects. State variables and endpoints must emit exhaustive representations or return formal `Result` payloads resolving operation success margins out in the open.
+## Swift Error Handling
+1. **LocalizedError Conformance**: When defining custom Domain `Error` enums in Swift, ALWAYS ensure they conform to the `LocalizedError` protocol and override `public var errorDescription: String?`. If custom enums only conform to the standard `Error` protocol, calling `error.localizedDescription` inside UI layers will discard any embedded string payloads and render a generic class dump (e.g., `"The operation couldn't be completed"`).
