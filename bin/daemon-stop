@@ -4,9 +4,9 @@ source "$(dirname "$0")/common"
 
 help() {
     if [ -n "$1" ]; then
-        echo "$1" >&2
+        log-error "$1"
     fi
-    echo "Usage: bin/stop-daemon [-h|--help] <SERVICE_NAME>"
+    echo "Usage: bin/daemon-stop [-h|--help] <SERVICE_NAME>"
     exit 1
 }
 
@@ -38,8 +38,7 @@ kill -15 "$PID" >/dev/null 2>&1 || true
 
 WAIT_FOR_TIMEOUT=30s
 if ! bin/wait-for "$WAIT_FOR_TIMEOUT" bash -c "! bin/check-pid \"$SERVICE_NAME\" >/dev/null 2>&1"; then
-    echo "Error: $SERVICE_NAME (PID $PID) failed to stop within $WAIT_FOR_TIMEOUT." >&2
-    exit 1
+    fatal "[$SERVICE_NAME] (PID [$PID]) failed to stop within [$WAIT_FOR_TIMEOUT]."
 fi
 
 echo "Service $SERVICE_NAME stopped."

@@ -38,9 +38,18 @@ services:
     working_dir: /workspace/rest-server
     ports:
       - "${SERVER_PORT:-8080}:${SERVER_PORT:-8080}"
+    env_file: .env
     environment:
       - SERVER_PORT=${SERVER_PORT:-8080}
     command: gradle run
+
+  test-runner:
+    image: gradle:8.5-jdk21
+    volumes:
+      - .:/workspace
+    working_dir: /workspace/rest-server
+    env_file: .env
+    command: gradle clean test
 
   api-test:
     image: schemathesis/schemathesis:stable

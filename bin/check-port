@@ -4,7 +4,7 @@ source "$(dirname "$0")/common"
 
 help() {
     if [ -n "$1" ]; then
-        echo "$1" >&2
+        log-error "$1"
     fi
     echo "Usage: bin/check-port [-h|--help] <SERVICE_NAME>"
     exit 1
@@ -27,8 +27,7 @@ SERVICE_NAME="$1"
 PORT_FILE="var/run/$SERVICE_NAME.port"
 
 if [ ! -f "$PORT_FILE" ]; then
-    echo "Error: No network port file found for $SERVICE_NAME" >&2
-    exit 1
+    fatal "No network port file found for [$SERVICE_NAME]"
 fi
 
 PORT=$(cat "$PORT_FILE")
@@ -37,6 +36,5 @@ if nc -z localhost "$PORT" >/dev/null 2>&1; then
     echo "Port ready: localhost:$PORT"
     exit 0
 else
-    echo "Port not ready: localhost:$PORT" >&2
-    exit 1
+    fatal "Port not ready: localhost:[$PORT]"
 fi

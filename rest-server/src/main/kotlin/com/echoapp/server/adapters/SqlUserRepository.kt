@@ -13,8 +13,7 @@ import java.time.Instant
 
 class SqlUserRepository : UserRepository {
     companion object {
-        const val SQLITE_CONSTRAINT = 19
-        const val SQLITE_CONSTRAINT_UNIQUE = 2067
+        const val POSTGRES_UNIQUE_VIOLATION = "23505"
     }
 
     override fun findById(id: String): User? {
@@ -56,8 +55,8 @@ class SqlUserRepository : UserRepository {
         }
         } catch (e: org.jetbrains.exposed.exceptions.ExposedSQLException) {
             val sqlException = e.cause as? java.sql.SQLException
-            if (sqlException?.errorCode == SQLITE_CONSTRAINT || sqlException?.errorCode == SQLITE_CONSTRAINT_UNIQUE) {
-                ProfileUpdateResult.Conflict("A database constraint violation occurred during update")
+            if (sqlException?.sqlState == POSTGRES_UNIQUE_VIOLATION) {
+                return ProfileUpdateResult.Conflict("A database constraint violation occurred during update")
             } else {
                 throw e
             }

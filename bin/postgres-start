@@ -1,0 +1,23 @@
+#!/bin/bash
+set -e
+source "$(dirname "$0")/common"
+
+function help() {
+    local msg="$1"
+    if [ -n "$msg" ]; then
+        log-error "$msg"
+    fi
+    cat << EOF
+$(basename "$0") [options]
+
+Thin wrapper booting the PostgreSQL docker composition.
+
+Options:
+-h|--help: prints help message and exits
+EOF
+    exit 1
+}
+
+if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then help; fi
+
+bin/daemon-start "postgres" "docker/postgres-compose.yml" "${POSTGRES_PORT:-5432}"

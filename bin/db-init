@@ -1,0 +1,53 @@
+#!/bin/bash
+set -e
+source "$(dirname "$0")/common"
+
+function help() {
+    local msg="$1"
+    if [ -n "$msg" ]; then
+        log-error "$msg"
+    fi
+    cat << EOF
+$(basename "$0") [options]
+
+Idempotently provisions the target database and tracking framework.
+
+Options:
+-h|--help: prints help message and exits
+EOF
+    exit 1
+}
+
+if [ "$#" -ne 0 ]; then
+    if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+        help
+        exit 1
+    else
+        help "Unknown argument: $1"
+    fi
+fi
+
+DB_NAME="${POSTGRES_DB:-unicoach}"
+DB_USER="${POSTGRES_USER:-postgres}"
+
+STATUS=0
+./bin/db-status > /dev/null 2>&1 || STATUS=$?
+
+if [ "$STATUS" -eq 1 ]; then
+    fatal "Database instance is unreachable."
+fi
+
+if [ "$STATUS" -eq 2 ]; then
+    log-info "Initializing database [$DB_NAME]..."
+    docker compose -f docker/postgres-compose.yml exec postgres psql -U "$DB_USER" -d postgres -tAc "CREATE DATABASE $DB_NAME;" || true
+    # Now that the DB exists, bump status simulate missing schema table
+    STATUS=3
+fi
+
+if [ "$STATUS" -eq 3 ]; then
+    log-info "Initializing tracking table [schema_migrations]..."
+    docker compose -f docker/postgres-compose.yml exec postgres psql -U "$DB_USER" -d "$DB_NAME" -tAc "CREATE TABLE IF NOT EXISTS schema_migrations (version VARCHAR PRIMARY KEY, applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);"
+fi
+
+log-info "Database [$DB_NAME] initialization complete."
+exit 

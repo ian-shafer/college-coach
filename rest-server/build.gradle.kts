@@ -26,11 +26,18 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-jdbc:0.46.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
     implementation("org.mindrot:jbcrypt:0.4")
-    implementation("org.xerial:sqlite-jdbc:3.45.1.0")
+    implementation("org.postgresql:postgresql:42.7.2")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("org.jetbrains.exposed:exposed-dao:0.46.0")
 }
 
 sourceSets {
     main {
         kotlin.srcDir("../build/rest-server-stubs/src/main/kotlin")
     }
+}
+
+tasks.test {
+    useJUnitPlatform()
 }

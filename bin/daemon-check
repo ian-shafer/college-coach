@@ -4,9 +4,9 @@ source "$(dirname "$0")/common"
 
 help() {
     if [ -n "$1" ]; then
-        echo "$1" >&2
+        log-error "$1"
     fi
-    echo "Usage: bin/check-daemon [-h|--help] <SERVICE_NAME>"
+    echo "Usage: bin/daemon-check [-h|--help] <SERVICE_NAME>"
     exit 1
 }
 

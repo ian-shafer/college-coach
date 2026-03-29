@@ -19,3 +19,5 @@ node_modules/
 xcuserdata/
 *.xcworkspace/xcuserdata/
 *.xcodeproj/xcuserdata/
+.env
+*.swp

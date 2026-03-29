@@ -1,0 +1,32 @@
+#!/bin/bash
+set -e
+
+# Private abstract logger managing stream labels natively
+_log() {
+    local label="$1"
+    shift
+    if [ -n "$label" ]; then
+        echo -e "[$label] $*" 1>&2
+    else
+        echo -e "$@" 1>&2
+    fi
+}
+
+# Standardized logging routing all informational traces to standard error (stderr).
+# This guarantees that standard output (stdout) remains perfectly clean for pipelining.
+log-info() {
+    _log "" "$@"
+}
+
+# Standardized error routing.
+log-error() {
+    _log "ERROR" "$@"
+}
+
+# Standardized fatal routing that immediately ends script execution.
+fatal() {
+    local msg="$1"
+    local code="${2:-1}"
+    _log "FATAL" "$msg"
+    exit "$code"
+}

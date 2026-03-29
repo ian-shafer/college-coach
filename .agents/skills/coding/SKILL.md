@@ -29,3 +29,18 @@ This skill establishes the universal logic constraints that apply across all pro
 5. **Avoid Metasyntactic Naming** (Concrete Identifiers)
    - Do not append ambiguous filler words like `State`, `Data`, or `Info` onto entity names.
    - Class and variable constructs must evaluate clear structural bounds directly (e.g., use `Session` instead of `SessionState`).
+
+6. **Dynamic Variable Formatting** (Bracket Serialization)
+   - ALWAYS wrap dynamic variables in brackets (`[]`) instead of single quotes (`''`) when printing strings in non-end-user communications (e.g., logs, CLIs, system outputs). 
+   - *Example*: `log-info "Processed node [$NODE_ID] successfully."`
+
+7. **Extramarital Routing Defaults** (Explicit Interfaces Over Implicit Magic)
+   - Do NOT rely on undocumented runtime inheritance or magic environment variables (e.g., `export COMPOSE_FILE="..."` bubbling up transparently to mask system behaviors).
+   - Core interfaces and engines MUST be passed required context explicitly via visible command-line arguments or explicit mapping configuration files (e.g., passing `-f path` gracefully downward) so engineers can decipher command flow via pure static analysis without needing to map environment graphs.
+
+8. **Semantic Output Streams** (Error and Fatal Routing)
+   - NEVER pipe `echo` directly to `>&2` inside script execution logic for error messages.
+   - You MUST utilize the globally integrated `log-error "My Message"` method defined in `bin/functions` explicitly for all error payloads. This guarantees that standard error is formatted universally with prefixes and standardized terminal outputs (e.g., `[ERROR] My Message`).
+   - For errors that immediately terminal the script (e.g., followed immediately by `exit 1`), you MUST use the `fatal "My Message"` method. It behaves identically to `log-error` but formats as `[FATAL] My Message` and natively executes the `exit 1` block so that logic is DRY.
+
+

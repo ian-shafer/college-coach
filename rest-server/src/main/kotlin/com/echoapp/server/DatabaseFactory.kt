@@ -1,12 +1,9 @@
 package com.echoapp.server
 
 import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.Table
-import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.javatime.timestamp
 import org.jetbrains.exposed.sql.javatime.CurrentTimestamp
-import java.io.File
 import io.ktor.server.config.ApplicationConfig
 
 object Users : Table() {
@@ -24,15 +21,16 @@ object Users : Table() {
 
 object DatabaseFactory {
     fun init(config: ApplicationConfig) {
-        val dbFile = config.propertyOrNull("database.file")?.getString() ?: "var/echo.db"
-        val file = File(dbFile)
-        val dir = file.parentFile
-        if (dir != null && !dir.exists()) dir.mkdirs()
+        val dbName = System.getenv("POSTGRES_DB") ?: "unicoach"
+        val dbUser = System.getenv("POSTGRES_USER") ?: "postgres"
+        val dbPort = System.getenv("POSTGRES_PORT") ?: "5432"
+        val dbHost = System.getenv("POSTGRES_HOST") ?: "localhost"
 
-        Database.connect("jdbc:sqlite:$dbFile", "org.sqlite.JDBC")
-
-        transaction {
-            SchemaUtils.create(Users)
-        }
+        Database.connect(
+            url = "jdbc:postgresql://$dbHost:$dbPort/$dbName",
+            driver = "org.postgresql.Driver",
+            user = dbUser,
+            password = ""
+        )
     }
 }

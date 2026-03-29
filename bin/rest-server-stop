@@ -4,9 +4,9 @@ source "$(dirname "$0")/common"
 
 help() {
     if [ -n "$1" ]; then
-        echo "$1" >&2
+        log-error "$1"
     fi
-    echo "Usage: bin/start-rest-server [-h|--help]"
+    echo "Usage: bin/rest-server-stop [-h|--help]"
     exit 1
 }
 
@@ -22,4 +22,4 @@ if [ "$#" -gt 0 ]; then
     help "Unexpected argument(s) provided: [$*]"
 fi
 
-bin/start-daemon "rest-server" "8080"
+bin/daemon-stop "rest-server"

@@ -1,0 +1,78 @@
+#!/bin/bash
+set -e
+source "$(dirname "$0")/common"
+
+function help() {
+    local msg="$1"
+    if [ -n "$msg" ]; then
+        log-error "$msg"
+    fi
+    cat << EOF
+$(basename "$0") [options]
+
+Irreversibly drops the initialized database and wipes schema tracking.
+
+Options:
+-h|--help: prints help message and exits
+--destroy-my-data-forever: allows the script to delete data without user interaction.
+EOF
+    exit 1
+}
+
+FORCE=0
+
+for arg in "$@"; do
+    case $arg in
+        -h|--help)
+            help
+            ;;
+        --destroy-my-data-forever)
+            FORCE=1
+            break
+            ;;
+        *)
+            help "Unknown argument: $arg"
+            ;;
+    esac
+done
+
+DB_NAME="${POSTGRES_DB:-unicoach}"
+DB_USER="${POSTGRES_USER:-postgres}"
+
+STATUS=0
+./bin/db-status > /dev/null 2>&1 || STATUS=$?
+
+if [ "$STATUS" -eq 1 ]; then
+    fatal "Database is not running."
+fi
+
+if [ "$STATUS" -eq 2 ]; then
+    log-info "Database [$DB_NAME] does not exist."
+    exit 0
+fi
+
+if [ "$FORCE" -eq 0 ]; then
+    log-info "\nWARNING: You are about to permanently drop the [$DB_NAME] database."
+    while true; do
+        log-info -n "Type 'DESTROY' to confirm (or press Ctrl-C to abort): "
+        if ! read -r CONFIRMATION; then
+            log-info "\nAborted."
+            exit 1
+        fi
+        if [ "$CONFIRMATION" = "DESTROY" ]; then
+            break
+        else
+            log-info "Invalid entry. Please try again."
+        fi
+    done
+fi
+
+log-info "Dropping database [$DB_NAME]..."
+
+# Terminate active connections so dropping succeeds natively
+docker compose -f docker/postgres-compose.yml exec -T postgres psql -U "$DB_USER" -d postgres -tAc "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '$DB_NAME' AND pid <> pg_backend_pid();" > /dev/null 2>&1 || true
+
+docker compose -f docker/postgres-compose.yml exec -T postgres psql -U "$DB_USER" -d postgres -tAc "DROP DATABASE $DB_NAME;"
+
+log-info "Database [$DB_NAME] successfully destroyed."
+exit 0
