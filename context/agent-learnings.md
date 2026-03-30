@@ -23,3 +23,9 @@
 1. **Functional State Mutations**: All persistent state engines (like `Keychain` interfaces or Domain models tracking properties) must structure immutable objects preventing `Void` side-effects. State variables and endpoints must emit exhaustive representations or return formal `Result` payloads resolving operation success margins out in the open.
 ## Swift Error Handling
 1. **LocalizedError Conformance**: When defining custom Domain `Error` enums in Swift, ALWAYS ensure they conform to the `LocalizedError` protocol and override `public var errorDescription: String?`. If custom enums only conform to the standard `Error` protocol, calling `error.localizedDescription` inside UI layers will discard any embedded string payloads and render a generic class dump (e.g., `"The operation couldn't be completed"`).
+
+## Exposed JDBC Context
+1. **UPDATE RETURNING Exceptions**: Whenever executing an `UPDATE ... RETURNING ...` string via `exec()` in JetBrains Exposed, you MUST pass `explicitStatementType = StatementType.SELECT`. Otherwise, the internal Expose ORM parses the `UPDATE` prefix heuristically mapping it unconditionally to `executeUpdate()` which crashes the `PSQLException` driver since a result block is unexpectedly emitted by Postgres!
+
+## Integration Testing Standards
+1. **Active Database DB Polling**: When building asynchronous logic inside JUnit against a local Docker container targeting Postgres (like lock expiration testing or asynchronous processing delays), never rely on naive Thread delays (`delay(100)`). The integration tests MUST physically poll the database aggressively inside a timeout loop (e.g., verifying `locked_until <= NOW()`) guaranteeing determinism flawlessly bypassing arbitrary compute limits flawlessly!

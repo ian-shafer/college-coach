@@ -18,3 +18,4 @@ Maintains the concrete service implementation details routing dynamic persistenc
 
 ## ⚠️ Strict Constraints & Known Gotchas
 - **Database Thread Safety:** Native JVM functions invoking transitions (`markFailure`, `markComplete`) strictly bypass exposed `INSERT` bindings mapping heavily into raw JDBC `exec()` statements naturally trapping atomic `plpgsql` SQL functions.
+- **Statement Type Resolution:** When executing raw `UPDATE ... RETURNING` statements natively in JetBrains Exposed via `Transaction.exec`, you MUST explicitly pass `explicitStatementType = StatementType.SELECT`. Otherwise, Exposed attempts to parse it as an empty row-update resulting in `org.postgresql.util.PSQLException: A result was returned when none was expected`.
