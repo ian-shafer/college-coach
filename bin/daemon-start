@@ -6,37 +6,41 @@ help() {
     if [ -n "$1" ]; then
         log-error "$1"
     fi
-    cat << EOF
-bin/daemon-start [options] <SERVICE_NAME> <DOCKER_COMPOSE_FILE> <PORT>
+    cat << 'EOF'
+bin/daemon-start [options] <SERVICE_NAME> <DOCKER_COMPOSE_FILE>
 
 Starts a background daemon service explicitly.
 
 Options:
--h|--help: prints help message and exits
+  -p, --port <PORT>    The network port to test when the daemon is started.
+  -h, --help           Prints help message and exits.
 EOF
     exit 1
 }
 
+PORT=""
+
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         -h|--help) help ;;
+        -p|--port) PORT="$2"; shift ;;
+        --port=*) PORT="${1#*=}" ;;
         -*) help "Unknown option [$1]" ;;
         *) break ;;
     esac
+    shift
 done
 
-if [ "$#" -ne 3 ]; then
-    help "Expected exactly 3 arguments: <SERVICE_NAME> <DOCKER_COMPOSE_FILE> <PORT>"
+if [ "$#" -ne 2 ]; then
+    help "Expected exactly 2 arguments: <SERVICE_NAME> <DOCKER_COMPOSE_FILE>"
 fi
 
 SERVICE_NAME="$1"
 DOCKER_COMPOSE_FILE="$2"
-PORT="$3"
 
 mkdir -p var/run var/log
 
 PID_FILE="var/run/$SERVICE_NAME.pid"
-PORT_FILE="var/run/$SERVICE_NAME.port"
 
 if [ -f "$PID_FILE" ]; then
     if bin/check-pid "$SERVICE_NAME" >/dev/null 2>&1; then
@@ -44,25 +48,37 @@ if [ -f "$PID_FILE" ]; then
     fi
 fi
 
-echo "$PORT" > "$PORT_FILE"
-
-echo "Starting $SERVICE_NAME on port $PORT..."
+if [ -n "$PORT" ]; then
+    echo "Starting $SERVICE_NAME on port $PORT..."
+else
+    echo "Starting $SERVICE_NAME..."
+fi
 
 COMPOSE_CMD=("docker" "compose")
 if [ -n "$DOCKER_COMPOSE_FILE" ]; then
     COMPOSE_CMD+=("-f" "$DOCKER_COMPOSE_FILE")
 fi
 
-SERVER_PORT="$PORT" "${COMPOSE_CMD[@]}" up "$SERVICE_NAME" > "var/log/$SERVICE_NAME.log" 2>&1 &
+ENV_VARS=()
+if [ -n "$PORT" ]; then
+    ENV_VARS+=("SERVER_PORT=$PORT")
+fi
+
+env "${ENV_VARS[@]}" "${COMPOSE_CMD[@]}" up "$SERVICE_NAME" > "var/log/$SERVICE_NAME.log" 2>&1 &
 PID=$!
 
 echo "$PID" > "$PID_FILE"
 
 WAIT_FOR_TIMEOUT=30
-if bin/wait-for "$WAIT_FOR_TIMEOUT" bin/check-port "$SERVICE_NAME" >/dev/null 2>&1; then
+if [ -n "$PORT" ]; then
+    if bin/wait-for "$WAIT_FOR_TIMEOUT" bin/check-port "$SERVICE_NAME" "$PORT" >/dev/null 2>&1; then
+        echo "Successfully started $SERVICE_NAME (PID: $PID) on port $PORT"
+        exit 0
+    else
+        kill $PID 2>/dev/null || true
+        fatal "[$SERVICE_NAME] failed to bind port [$PORT] within [$WAIT_FOR_TIMEOUT] seconds."
+    fi
+else
     echo "Successfully started $SERVICE_NAME (PID: $PID)"
     exit 0
-else
-    kill $PID 2>/dev/null || true
-    fatal "[$SERVICE_NAME] failed to start within [$WAIT_FOR_TIMEOUT] seconds."
 fi

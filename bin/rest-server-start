@@ -6,7 +6,11 @@ help() {
     if [ -n "$1" ]; then
         log-error "$1"
     fi
-    echo "Usage: bin/rest-server-start [-h|--help]"
+    cat << 'EOF'
+Usage: bin/rest-server-start [-h|--help]
+
+Starts the central Ktor REST engine locally mapping HTTP bounds.
+EOF
     exit 1
 }
 
@@ -22,4 +26,4 @@ if [ "$#" -gt 0 ]; then
     help "Unexpected argument(s) provided: [$*]"
 fi
 
-bin/daemon-start "rest-server" "docker-compose.yml" "8080"
+bin/daemon-start -p "8080" "rest-server" "docker-compose.yml"

@@ -1,0 +1,33 @@
+#!/bin/bash
+set -e
+source "$(dirname "$0")/common"
+
+help() {
+    if [ -n "$1" ]; then
+        log-error "$1"
+    fi
+    cat << 'EOF'
+Usage: bin/queue-status [-h|--help]
+Prints high-level information about the active queue tables.
+EOF
+    exit 1
+}
+
+if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then help; fi
+
+log-info "Queue Status Overview"
+
+echo "=== Idle Messages ==="
+bin/db-query "SELECT type, COUNT(*) as count FROM queue_messages WHERE locked_until IS NULL OR locked_until <= NOW() GROUP BY type ORDER BY count DESC;"
+
+echo ""
+echo "=== Processing (Locked) ==="
+bin/db-query "SELECT type, COUNT(*) as count FROM queue_messages WHERE locked_until > NOW() GROUP BY type ORDER BY count DESC;"
+
+echo ""
+echo "=== Recently Completed (History) ==="
+bin/db-query "SELECT type, COUNT(*) as count FROM queue_history GROUP BY type ORDER BY count DESC;"
+
+echo ""
+echo "=== Failures (Dead-Letter) ==="
+bin/db-query "SELECT type, COUNT(*) as count FROM queue_failures GROUP BY type ORDER BY count DESC;"

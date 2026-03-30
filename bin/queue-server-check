@@ -6,7 +6,9 @@ help() {
     if [ -n "$1" ]; then
         log-error "$1"
     fi
-    echo "Usage: bin/rest-server-restart [-h|--help]"
+    cat << 'EOF'
+Usage: bin/queue-server-check [-h|--help]
+EOF
     exit 1
 }
 
@@ -22,4 +24,4 @@ if [ "$#" -gt 0 ]; then
     help "Unexpected argument(s) provided: [$*]"
 fi
 
-bin/daemon-restart "rest-server"
+bin/daemon-check "queue-server"

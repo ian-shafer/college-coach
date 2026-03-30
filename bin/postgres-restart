@@ -10,7 +10,7 @@ function help() {
     cat << EOF
 $(basename "$0") [options]
 
-Thin wrapper restarting the PostgreSQL docker composition.
+Thin wrapper restarting the postgres docker composition.
 
 Options:
 -h|--help: prints help message and exits
@@ -20,6 +20,4 @@ EOF
 
 if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then help; fi
 
-log-info "Restarting PostgreSQL daemon..."
-bin/postgres-stop
-bin/postgres-start
+bin/daemon-restart "postgres"

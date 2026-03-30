@@ -10,7 +10,7 @@ function help() {
     cat << EOF
 $(basename "$0") [options]
 
-Drops securely into a live interactive PostgreSQL shell connected to the backend instance.
+Drops securely into a live interactive postgres shell connected to the backend instance.
 
 Options:
 -h|--help: prints help message and exits

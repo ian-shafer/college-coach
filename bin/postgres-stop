@@ -10,7 +10,7 @@ function help() {
     cat << EOF
 $(basename "$0") [options]
 
-Thin wrapper halting the PostgreSQL docker composition.
+Thin wrapper halting the postgres docker composition.
 
 Options:
 -h|--help: prints help message and exits

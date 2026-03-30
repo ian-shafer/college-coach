@@ -6,7 +6,12 @@ help() {
     if [ -n "$1" ]; then
         log-error "$1"
     fi
-    echo "Usage: bin/check-port [-h|--help] <SERVICE_NAME>"
+    cat << 'EOF'
+bin/check-port <SERVICE_NAME> <PORT>
+
+Options:
+  -h, --help           Shows this help message.
+EOF
     exit 1
 }
 
@@ -18,19 +23,12 @@ while [[ "$#" -gt 0 ]]; do
     esac
 done
 
-if [ "$#" -ne 1 ]; then
-    help "Expected exactly 1 argument: <SERVICE_NAME>"
+if [ "$#" -ne 2 ]; then
+    help "Expected exactly 2 arguments: <SERVICE_NAME> <PORT>"
 fi
 
 SERVICE_NAME="$1"
-
-PORT_FILE="var/run/$SERVICE_NAME.port"
-
-if [ ! -f "$PORT_FILE" ]; then
-    fatal "No network port file found for [$SERVICE_NAME]"
-fi
-
-PORT=$(cat "$PORT_FILE")
+PORT="$2"
 
 if nc -z localhost "$PORT" >/dev/null 2>&1; then
     echo "Port ready: localhost:$PORT"

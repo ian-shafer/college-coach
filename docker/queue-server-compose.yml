@@ -1,0 +1,8 @@
+services:
+  queue-server:
+    image: gradle:8.5-jdk21
+    volumes:
+      - ..:/workspace
+    working_dir: /workspace/queue-server
+    env_file: ../.env
+    command: gradle run

@@ -1,0 +1,36 @@
+#!/bin/bash
+set -e
+source "$(dirname "$0")/common"
+
+help() {
+    if [ -n "$1" ]; then
+        log-error "$1"
+    fi
+    cat << 'EOF'
+Usage: bin/queue-truncate [-h|--help] [TYPE]
+Removes all pending configurations. Optionally pass [TYPE] to truncate a specific QueueType.
+EOF
+    exit 1
+}
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        -h|--help) help ;;
+        -*) help "Unknown option [$1]" ;;
+        *) break ;;
+    esac
+done
+
+if [ "$#" -gt 1 ]; then
+    help "Unexpected argument(s) provided: [$*]"
+fi
+
+TYPE="$1"
+
+if [ -n "$TYPE" ]; then
+    log-info "Truncating queue matching type [$TYPE]..."
+    bin/db-query "DELETE FROM queue_messages WHERE type = '$TYPE';"
+else
+    log-info "Truncating all active queues..."
+    bin/db-query "TRUNCATE queue_messages;"
+fi

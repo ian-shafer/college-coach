@@ -62,7 +62,7 @@ class SqlUserRepositoryIntegrationTest {
         // 5. Assert Ktor strictly isolated the 23505 constraints catching without a 500
         assertTrue(
             result2 is ProfileUpdateResult.Conflict, 
-            "User 2 update MUST structurally return Conflict when tripping PostgreSQL 23505 index limits"
+            "User 2 update MUST structurally return Conflict when tripping postgres 23505 index limits"
         )
     }
 }

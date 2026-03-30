@@ -2,22 +2,29 @@
 set -e
 source "$(dirname "$0")/common"
 
-function help() {
-    local msg="$1"
-    if [ -n "$msg" ]; then
-        log-error "$msg"
+help() {
+    if [ -n "$1" ]; then
+        log-error "$1"
     fi
-    cat << EOF
-$(basename "$0") [options]
+    cat << 'EOF'
+Usage: bin/postgres-start [-h|--help]
 
-Thin wrapper booting the PostgreSQL docker composition.
-
-Options:
--h|--help: prints help message and exits
+Thin wrapper booting the postgres docker composition.
 EOF
     exit 1
 }
 
-if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then help; fi
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        -h|--help) help ;;
+        -*) help "Unknown option [$1]" ;;
+        *) break ;;
+    esac
+    shift
+done
 
-bin/daemon-start "postgres" "docker/postgres-compose.yml" "${POSTGRES_PORT:-5432}"
+if [ "$#" -gt 0 ]; then
+    help "Unexpected argument(s) provided: [$*]"
+fi
+
+bin/daemon-start -p "${POSTGRES_PORT:-5432}" "postgres" "docker/postgres-compose.yml"

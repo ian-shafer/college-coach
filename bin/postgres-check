@@ -10,7 +10,7 @@ function help() {
     cat << EOF
 $(basename "$0") [options]
 
-Thin wrapper checking the PostgreSQL daemon states natively.
+Thin wrapper checking the postgres daemon states natively.
 
 Options:
 -h|--help: prints help message and exits

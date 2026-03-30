@@ -11,7 +11,10 @@ Contains the core Unix-based executable shell scripts responsible for managing a
 - **wait-for:** Generic polling utility extracting loops into a single timeout script.
 - **daemon-start:** Core functional hook trapping PID values and invoking ports.
 - **daemon-stop:** Universal termination execution blocking on `daemon-check` verification.
+- **db-query:** Central Postgres abstraction strictly mapping SQL hooks down dynamically safely decoupling queries structurally mimicking standard interfaces.
+- **daemon-restart:** Creates a unified `stop` then `start` shell execution utility functionally abstracting restart bounds.
 - **daemon-check:** High-level validation unifying process testing across `.pid` and `.port` outputs.
+- **Queue Administration Wrappers:** Includes specific async overrides (`queue-status`, `queue-insert`, `queue-rm`, `queue-truncate`) mapping dynamically directly into postgres layers to interrogate `queue_messages` explicitly.
 
 ## 🔄 State & Data Flow
 - **Data Mutability:** State tracks into persistent cache files mapping `.pid` and `.port` states inside isolated `var/run/` directories.

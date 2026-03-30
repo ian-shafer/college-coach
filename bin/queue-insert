@@ -1,0 +1,40 @@
+#!/bin/bash
+set -e
+source "$(dirname "$0")/common"
+
+help() {
+    if [ -n "$1" ]; then
+        log-error "$1"
+    fi
+    cat << 'EOF'
+Usage: bin/queue-insert [-h|--help] <TYPE> <JSON_PAYLOAD>
+
+Inserts a physical JSON payload dynamically triggering the background workers.
+
+Example:
+  bin/queue-insert "TEST_QUEUE" '{"message": "Hello World!"}'
+EOF
+    exit 1
+}
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        -h|--help) help ;;
+        -*) help "Unknown option [$1]" ;;
+        *) break ;;
+    esac
+done
+
+if [ "$#" -ne 2 ]; then
+    help "Expected exactly 2 arguments: <TYPE> <JSON_PAYLOAD>"
+fi
+
+TYPE="$1"
+PAYLOAD="$2"
+
+log-info "Publishing payload structurally into type [$TYPE]..."
+
+# We utilize psql syntax bypassing complex SQL inserts escaping
+bin/db-query "INSERT INTO queue_messages (type, payload) VALUES ('$TYPE', '$PAYLOAD'::jsonb);"
+
+log-info "Payload insertion dispatched."
